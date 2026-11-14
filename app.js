@@ -694,6 +694,11 @@ function updateActuatorVisuals() {
     }
   }
 
+  const btnQuickPump = document.getElementById('btnQuickPondPump');
+  if (btnQuickPump) {
+    btnQuickPump.innerText = state.actuators.pump ? 'Matikan Pompa' : 'Nyalakan Pompa';
+  }
+
   // Sinkronisasi status di canvas dan box panel
   updateHardwarePanelVisuals();
 }
@@ -1190,7 +1195,8 @@ const pondState = {
   bubbles: [],
   splashes: [],
   feedPellets: [],
-  fishes: []
+  fishes: [],
+  pumpStreams: []
 };
 
 function initHardwareView() {
@@ -1216,6 +1222,18 @@ function initHardwareView() {
     btnQuickAerator.addEventListener('click', () => {
       setAeratorState(!state.actuators.aerator, 'Tombol Visual Kolam');
       btnQuickAerator.innerText = state.actuators.aerator ? 'Matikan Kincir Air' : 'Nyalakan Kincir Air';
+    });
+  }
+
+  const btnQuickPump = document.getElementById('btnQuickPondPump');
+  if (btnQuickPump) {
+    btnQuickPump.addEventListener('click', () => {
+      state.actuators.pump = !state.actuators.pump;
+      const switchPump = document.getElementById('switchPump');
+      if (switchPump) switchPump.checked = state.actuators.pump;
+      updateActuatorVisuals();
+      logEvent(state.actuators.pump ? 'Pompa Sirkulasi Dinyalakan' : 'Pompa Sirkulasi Dimatikan', '-', 'Tombol Visual Kolam');
+      showToast(state.actuators.pump ? 'Pompa sirkulasi aktif' : 'Pompa sirkulasi berhenti', 'info');
     });
   }
 
@@ -1416,6 +1434,10 @@ function renderPondScene(now) {
   // 5. Kincir Aerator
   drawPaddlewheelAerator(pondCtx, waterLine, now);
 
+  // 5b. Pompa Sirkulasi & Semburan Arus Air
+  drawCirculationPump(pondCtx, waterLine, now);
+  updateAndDrawPumpStream(pondCtx, waterLine);
+
   // 6. Butiran Pakan
   updateAndDrawFeed(pondCtx, waterLine, h);
 
@@ -1553,6 +1575,146 @@ function drawPaddlewheelAerator(ctx, waterLine, now) {
   ctx.arc(0, 0, 7, 0, Math.PI * 2);
   ctx.fill();
   ctx.restore();
+}
+
+function drawCirculationPump(ctx, waterLine, now) {
+  const px = 185;
+  const py = 205;
+  const isPumpOn = state.actuators.pump;
+
+  // Vibrasi getaran halus saat pompa aktif
+  const vibY = isPumpOn ? Math.sin(now * 0.08) * 0.5 : 0;
+
+  // Pipa PVC Inlet/Suction Vertikal dari Dermaga ke Pompa
+  ctx.fillStyle = '#475569';
+  ctx.fillRect(px - 14, 110, 10, py - 110 + 10);
+  ctx.fillStyle = '#334155';
+  ctx.fillRect(px - 16, 150, 14, 6); // Flens sambungan pipa
+
+  // Casing Motor Pompa Celup Submersible (10A)
+  ctx.save();
+  ctx.translate(px, py + vibY);
+
+  // Body silinder pompa
+  ctx.fillStyle = '#1e293b';
+  ctx.beginPath();
+  ctx.roundRect(-18, -14, 36, 32, 6);
+  ctx.fill();
+  ctx.strokeStyle = '#0aa094';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Pelindung saringan bawah (intake strainer)
+  ctx.fillStyle = '#0f172a';
+  ctx.fillRect(-14, 18, 28, 8);
+  ctx.fillStyle = '#64748b';
+  for (let i = -10; i <= 10; i += 5) {
+    ctx.fillRect(i, 20, 2, 4);
+  }
+
+  // Corong Nozzle Semburan Air (menghadap ke kanan kolam)
+  ctx.fillStyle = '#334155';
+  ctx.beginPath();
+  ctx.moveTo(18, -6);
+  ctx.lineTo(34, -10);
+  ctx.lineTo(34, 14);
+  ctx.lineTo(18, 10);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = '#0aa094';
+  ctx.stroke();
+
+  // Cincin nozzle outlet
+  ctx.fillStyle = isPumpOn ? '#2dd4bf' : '#64748b';
+  ctx.fillRect(34, -11, 4, 26);
+
+  // Lampu Status LED Pompa
+  ctx.fillStyle = isPumpOn ? '#10b981' : '#64748b';
+  ctx.beginPath();
+  ctx.arc(-8, -6, 2.5, 0, Math.PI * 2);
+  ctx.fill();
+  if (isPumpOn) {
+    ctx.fillStyle = 'rgba(16, 185, 129, 0.4)';
+    ctx.beginPath();
+    ctx.arc(-8, -6, 5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.restore();
+}
+
+function updateAndDrawPumpStream(ctx, waterLine) {
+  const isPumpOn = state.actuators.pump;
+  const nozzleX = 222;
+  const nozzleY = 205;
+
+  if (isPumpOn) {
+    // Spawn partikel garis arus semprotan air
+    for (let i = 0; i < 4; i++) {
+      pondState.pumpStreams.push({
+        x: nozzleX + Math.random() * 8,
+        y: nozzleY + (Math.random() - 0.5) * 12,
+        vx: 4.5 + Math.random() * 4.5,
+        vy: (Math.random() - 0.5) * 0.9,
+        size: 1.5 + Math.random() * 2,
+        length: 12 + Math.random() * 18,
+        alpha: 0.85
+      });
+    }
+
+    // Spawn micro bubbles semburan
+    for (let i = 0; i < 2; i++) {
+      pondState.bubbles.push({
+        x: nozzleX + 15 + Math.random() * 20,
+        y: nozzleY + (Math.random() - 0.5) * 14,
+        vx: 3 + Math.random() * 3,
+        vy: -Math.random() * 0.6 - 0.2,
+        size: Math.random() * 2.5 + 0.8,
+        alpha: 0.75
+      });
+    }
+
+    // Efek visual jet stream utama (garis semburan arus air melengkung dinamis)
+    const time = Date.now() * 0.005;
+    ctx.save();
+    for (let line = 0; line < 3; line++) {
+      const lineOffset = (line - 1) * 6;
+      ctx.strokeStyle = line === 1 ? 'rgba(45, 212, 191, 0.55)' : 'rgba(56, 189, 248, 0.35)';
+      ctx.lineWidth = 2 + (line === 1 ? 1 : 0);
+      ctx.beginPath();
+      ctx.moveTo(nozzleX, nozzleY + lineOffset);
+      const cpX = nozzleX + 120;
+      const cpY = nozzleY + lineOffset + Math.sin(time + line) * 6;
+      const endX = nozzleX + 260 + Math.sin(time * 0.8 + line) * 20;
+      const endY = nozzleY + lineOffset + 12 + Math.sin(time * 1.2 + line) * 8;
+      ctx.quadraticCurveTo(cpX, cpY, endX, endY);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  // Update & Draw Partikel Arus Pompa
+  for (let i = pondState.pumpStreams.length - 1; i >= 0; i--) {
+    const s = pondState.pumpStreams[i];
+    s.x += s.vx;
+    s.y += s.vy;
+    s.vx *= 0.985;
+    s.alpha -= 0.018;
+
+    if (s.alpha <= 0 || s.x > 500) {
+      pondState.pumpStreams.splice(i, 1);
+      continue;
+    }
+
+    ctx.save();
+    ctx.strokeStyle = `rgba(45, 212, 191, ${s.alpha})`;
+    ctx.lineWidth = s.size;
+    ctx.beginPath();
+    ctx.moveTo(s.x, s.y);
+    ctx.lineTo(s.x - s.length * (s.vx / 6), s.y - s.vy * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
 }
 
 function updateAndDrawFeed(ctx, waterLine, h) {
@@ -1822,6 +1984,15 @@ function drawComponentLabels(ctx) {
   ctx.lineTo(815, 25);
   ctx.stroke();
   ctx.fillText('Dispenser Pakan Otomatis', 680, 28);
+
+  // 5. Pompa Sirkulasi (10A)
+  ctx.beginPath();
+  ctx.moveTo(195, 205);
+  ctx.lineTo(195, 155);
+  ctx.lineTo(240, 155);
+  ctx.stroke();
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText('Pompa Sirkulasi (10A)', 245, 158);
 
   ctx.restore();
 }
