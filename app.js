@@ -1249,12 +1249,17 @@ function initHardwareView() {
 function spawnPondFeed() {
   const feederX = 860;
   const feederY = 130;
-  for (let i = 0; i < 40; i++) {
+  // Lontarkan 45 butir pakan pelet dengan efek semburan aerodinamis
+  for (let i = 0; i < 45; i++) {
+    const angle = Math.PI * (0.65 + Math.random() * 0.25); // meluncur ke arah kiri bawah
+    const force = 3.5 + Math.random() * 4.5;
     pondState.feedPellets.push({
-      x: feederX + (Math.random() - 0.5) * 20,
-      y: feederY + Math.random() * 10,
-      vx: (Math.random() - 0.5) * 1.5 - 1.2,
-      vy: Math.random() * 2 + 1
+      x: feederX - 8 + (Math.random() - 0.5) * 10,
+      y: feederY + Math.random() * 8,
+      vx: Math.cos(angle) * force,
+      vy: Math.sin(angle) * force - (Math.random() * 1.5),
+      size: 2.2 + Math.random() * 1.2,
+      inWater: false
     });
   }
 }
@@ -1551,22 +1556,48 @@ function drawPaddlewheelAerator(ctx, waterLine, now) {
 }
 
 function updateAndDrawFeed(ctx, waterLine, h) {
-  ctx.fillStyle = '#92400e';
+  ctx.fillStyle = '#b45309'; // Warna cokelat pelet pakan tambak
+  ctx.strokeStyle = '#78350f';
+  ctx.lineWidth = 0.5;
+
   for (let i = pondState.feedPellets.length - 1; i >= 0; i--) {
     const p = pondState.feedPellets[i];
     p.x += p.vx;
     p.y += p.vy;
 
-    if (p.y > waterLine) {
-      p.vy = 0.5 + Math.random() * 0.4;
-      p.vx *= 0.95;
+    // Saat masih di udara (menuju air)
+    if (p.y < waterLine) {
+      p.vy += 0.22; // Gravitasi
+    } else {
+      // Masuk ke dalam air
+      if (!p.inWater) {
+        p.inWater = true;
+        p.vx *= 0.35; // Tahanan air meredam laju horizontal
+        p.vy = 0.6 + Math.random() * 0.4;
+        // Percikan air kecil saat pelet masuk air
+        if (Math.random() > 0.6) {
+          pondState.splashes.push({
+            x: p.x,
+            y: waterLine,
+            vx: (Math.random() - 0.5) * 1.5,
+            vy: -Math.random() * 1.5 - 0.5,
+            alpha: 0.7
+          });
+        }
+      } else {
+        // Perlahan tenggelam di air
+        p.vy = 0.5 + Math.sin(p.y * 0.1) * 0.12;
+        p.vx *= 0.98;
+      }
     }
 
     ctx.beginPath();
-    ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
+    ctx.arc(p.x, p.y, p.size || 2.5, 0, Math.PI * 2);
     ctx.fill();
+    ctx.stroke();
 
-    if (p.y > h - 10) {
+    // Hapus jika menyentuh dasar kolam
+    if (p.y > h - 12) {
       pondState.feedPellets.splice(i, 1);
     }
   }
@@ -1639,15 +1670,75 @@ function updateAndDrawAeration(ctx, waterLine) {
 
 function updateAndDrawFishes(ctx, waterLine, h, w) {
   const isHypoxia = state.sensors.do < 5.00;
+  // Ambil butiran pakan yang sudah berada di dalam air
+  const activePellets = pondState.feedPellets.filter(p => p.y >= waterLine);
 
   pondState.fishes.forEach((fish) => {
     fish.tailPhase += 0.15;
 
     if (isHypoxia) {
+      // Saat hipoksia (DO < 5.0), ikan megap-megap di permukaan air
       const targetY = waterLine + 25 + Math.sin(fish.x * 0.01) * 15;
       fish.y += (targetY - fish.y) * 0.02;
       fish.x += fish.vx * 0.4;
+    } else if (activePellets.length > 0) {
+      // MODE MAKAN: Ada pakan di air, ikan mendeteksi dan mengejar pelet terdekat
+      let closestPellet = null;
+      let closestDist = Infinity;
+
+      for (let i = 0; i < activePellets.length; i++) {
+        const p = activePellets[i];
+        const d = Math.hypot(p.x - fish.x, p.y - fish.y);
+        if (d < closestDist) {
+          closestDist = d;
+          closestPellet = p;
+        }
+      }
+
+      if (closestPellet) {
+        // Gerak aktif dan antusias menuju pelet pakan
+        const dx = closestPellet.x - fish.x;
+        const dy = closestPellet.y - fish.y;
+        const dist = Math.max(1, Math.hypot(dx, dy));
+        const chaseSpeed = 2.4 + (fish.size % 3) * 0.3;
+
+        fish.vx = (dx / dist) * chaseSpeed;
+        fish.vy = (dy / dist) * chaseSpeed;
+        fish.x += fish.vx;
+        fish.y += fish.vy;
+        fish.tailPhase += 0.25; // Ekor mengibas cepat
+
+        // Koordinat mulut ikan di bagian depan
+        const mouthX = fish.x + (fish.vx >= 0 ? fish.size : -fish.size);
+        const mouthY = fish.y;
+        const eatDist = Math.hypot(closestPellet.x - mouthX, closestPellet.y - mouthY);
+
+        // IKAN MAKAN PAKAN: jika mulut ikan mencapai butiran pakan (< 15px)
+        if (eatDist < 15 || dist < 16) {
+          const pelletIdx = pondState.feedPellets.indexOf(closestPellet);
+          if (pelletIdx !== -1) {
+            pondState.feedPellets.splice(pelletIdx, 1);
+
+            // Efek buih remah makan di sekitar mulut ikan
+            for (let b = 0; b < 2; b++) {
+              pondState.bubbles.push({
+                x: mouthX + (Math.random() - 0.5) * 6,
+                y: mouthY + (Math.random() - 0.5) * 4,
+                vx: (Math.random() - 0.5) * 1.5,
+                vy: -Math.random() * 1.4 - 0.4,
+                size: Math.random() * 2 + 1,
+                alpha: 0.85
+              });
+            }
+          }
+        }
+      }
     } else {
+      // MODE NORMAL / PATROLI SANTAI
+      // Kembalikan kecepatan ke ritme tenang jika sebelumnya mengejar pakan
+      if (Math.abs(fish.vx) > 1.3) fish.vx *= 0.95;
+      if (Math.abs(fish.vy) > 0.6) fish.vy *= 0.95;
+
       fish.x += fish.vx;
       fish.y += fish.vy;
 
@@ -1655,9 +1746,11 @@ function updateAndDrawFishes(ctx, waterLine, h, w) {
       if (fish.y > h - 30) fish.vy = -Math.abs(fish.vy);
     }
 
+    // Batas dinding kiri dan kanan kolam
     if (fish.x < 120) fish.vx = Math.abs(fish.vx);
     else if (fish.x > w - 120) fish.vx = -Math.abs(fish.vx);
 
+    // Gambar Ikan
     ctx.save();
     ctx.translate(fish.x, fish.y);
     if (fish.vx < 0) ctx.scale(-1, 1);
@@ -1675,9 +1768,14 @@ function updateAndDrawFishes(ctx, waterLine, h, w) {
     ctx.closePath();
     ctx.fill();
 
+    // Mata ikan (putih + pupil hitam)
     ctx.fillStyle = '#ffffff';
     ctx.beginPath();
-    ctx.arc(fish.size * 0.5, -2, 2, 0, Math.PI * 2);
+    ctx.arc(fish.size * 0.5, -2, 2.2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#0f172a';
+    ctx.beginPath();
+    ctx.arc(fish.size * 0.5 + 0.6, -2, 1.1, 0, Math.PI * 2);
     ctx.fill();
 
     ctx.restore();
