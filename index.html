@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id" class="overflow-x-clip">
+<html lang="id" class="dark overflow-x-clip">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,230 +14,290 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- Fonts -->
+  <!-- Fonts: Geist & Geist Mono (Unslop Signature) + Fallbacks -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=2.1">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=3.1">
 </head>
-<body class="min-h-screen flex flex-col overflow-x-clip bg-slate-50 text-slate-800">
+<body class="h-screen w-screen overflow-hidden flex bg-paper text-ink">
 
-  <!-- TOP INDUSTRIAL HEADER (WIRU LIGHT MODE) -->
-  <header class="border-b border-slate-200 bg-white sticky top-0 z-40 px-4 lg:px-8 py-2.5 shadow-sm">
-    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+  <!-- LEFT SCADA DASHBOARD SIDEBAR (Unslop Dashboard Reference Craft: #0f0f10, 256px) -->
+  <aside class="w-64 bg-sidebar border-r border-rule flex flex-col shrink-0 z-30 select-none">
+    
+    <!-- Top Brand Header: Logo murni tanpa card/kotak -->
+    <div class="h-14 px-4 border-b border-rule flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <img src="assets/wiru.png" alt="WIRU" class="h-7 w-auto object-contain">
+        <span class="font-semibold text-sm tracking-wide text-ink font-mono">WIRU</span>
+      </div>
+      <span class="px-1.5 py-0.5 text-[9px] rounded bg-teal-500/10 text-teal-400 font-mono border border-teal-500/20 font-medium">v1.2</span>
+    </div>
+
+    <!-- Search Input (Unslop Reference Pattern with Keycap) -->
+    <div class="px-3 pt-3 pb-1">
+      <div class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-paper-2 border border-rule text-neutral-400 text-xs">
+        <i data-lucide="search" class="w-3.5 h-3.5 text-neutral-500 shrink-0"></i>
+        <input type="text" placeholder="Search..." class="bg-transparent text-xs text-ink placeholder-neutral-500 focus:outline-none flex-1 font-sans">
+        <span class="px-1.5 py-0.2 rounded bg-paper-3 text-[10px] text-neutral-400 font-mono border border-rule-2">⌘ K</span>
+      </div>
+    </div>
+
+    <!-- Sidebar Navigation Menu -->
+    <div class="flex-1 overflow-y-auto px-2 py-3 space-y-4">
       
-      <!-- Brand & Project Title -->
-      <div class="flex items-center gap-3">
-        <img src="assets/wiru.png" alt="Logo WIRU" class="h-9 w-auto object-contain">
-        <div>
-          <div class="flex items-center gap-2">
-            <h1 class="text-base font-bold text-wiru-navy tracking-wide font-mono">WIRU</h1>
-            <span class="text-slate-300">/</span>
-            <span class="text-xs text-slate-700 font-semibold">Smart Aquaculture OS</span>
-            <span class="px-2 py-0.5 text-[10px] rounded bg-teal-50 text-teal-800 font-mono border border-teal-200">v1.2</span>
+      <!-- Section: Navigation -->
+      <div>
+        <div class="text-[11px] font-mono text-neutral-500 px-2.5 mb-1.5">Navigation</div>
+        <nav class="space-y-0.5" id="mainTabs">
+          <button class="nav-tab active" data-tab="tab-cockpit">
+            <i data-lucide="layout-grid" class="w-4 h-4 shrink-0"></i>
+            <span>Overview (Cockpit)</span>
+          </button>
+          <button class="nav-tab" data-tab="tab-correlation">
+            <i data-lucide="line-chart" class="w-4 h-4 shrink-0"></i>
+            <span>Korelasi Kualitas</span>
+          </button>
+          <button class="nav-tab" data-tab="tab-feeder">
+            <i data-lucide="utensils" class="w-4 h-4 shrink-0"></i>
+            <span class="flex-1 text-left">Manajemen Pakan</span>
+            <span class="text-[10px] text-neutral-500 font-mono">4x</span>
+          </button>
+          <button class="nav-tab" data-tab="tab-hardware">
+            <i data-lucide="cpu" class="w-4 h-4 shrink-0"></i>
+            <span>Box Kontroler</span>
+          </button>
+          <button class="nav-tab" data-tab="tab-simulator">
+            <i data-lucide="sliders" class="w-4 h-4 shrink-0"></i>
+            <span>Simulator Anomali</span>
+          </button>
+          <button class="nav-tab" data-tab="tab-logs">
+            <i data-lucide="file-text" class="w-4 h-4 shrink-0"></i>
+            <span>Log &amp; Laporan</span>
+          </button>
+          <button class="nav-tab" data-tab="tab-trainer">
+            <i data-lucide="graduation-cap" class="w-4 h-4 shrink-0"></i>
+            <span>Trainer Kit Vokasi</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Section: Parameter Tambak (Unslop Reference "Plans" Pattern) -->
+      <div>
+        <div class="text-[11px] font-mono text-neutral-500 px-2.5 mb-1.5">Parameter kolam</div>
+        <div class="space-y-0.5 text-xs">
+          <div class="flex items-center justify-between px-2.5 py-1 rounded text-neutral-400">
+            <span>Oksigen (DO)</span>
+            <span class="font-mono text-neutral-200">5.40 mg/L</span>
           </div>
-          <p class="text-[11px] text-slate-500">SMKS Perikanan dan Kelautan Puger &bull; Tambak Praktik Pesisir</p>
+          <div class="flex items-center justify-between px-2.5 py-1 rounded text-neutral-400">
+            <span>Suhu air</span>
+            <span class="font-mono text-neutral-200">28.5 °C</span>
+          </div>
+          <div class="flex items-center justify-between px-2.5 py-1 rounded text-neutral-400">
+            <span>pH air</span>
+            <span class="font-mono text-neutral-200">7.40</span>
+          </div>
+          <div class="flex items-center justify-between px-2.5 py-1 rounded text-neutral-400">
+            <span>Salinitas</span>
+            <span class="font-mono text-neutral-200">18 ppt</span>
+          </div>
+          <div class="flex items-center justify-between px-2.5 py-1 rounded text-neutral-400">
+            <span>Kekeruhan</span>
+            <span class="font-mono text-neutral-200">32 NTU</span>
+          </div>
         </div>
       </div>
 
-      <!-- Quick Culture Metadata (Khas Jala / eFishery) -->
-      <div class="hidden xl:flex items-center gap-4 text-xs font-mono border-x border-slate-200 px-4">
-        <div>
-          <div class="text-[11px] text-slate-500">Siklus</div>
-          <div class="text-slate-800 font-semibold">DOC 42 <span class="text-slate-500 text-[10px]">(Siklus II)</span></div>
+    </div>
+
+    <!-- Sidebar Bottom Hardware Status -->
+    <div class="p-3 border-t border-rule bg-sidebar space-y-1.5">
+      <div class="flex items-center justify-between text-[11px]">
+        <span class="text-neutral-500">Hardware link</span>
+        <span id="connectionStatusBadge" class="flex items-center gap-1.5 text-teal-400 font-mono font-medium text-[11px]">
+          <span class="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse"></span>
+          <span id="connectionStatusText">ESP32 Online</span>
+        </span>
+      </div>
+      <div class="text-[10px] text-neutral-500 leading-tight">
+        SMKS Perikanan dan Kelautan Puger
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- RIGHT FLUID SCADA WORKBENCH (Graphite Dark #141415) -->
+  <div class="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
+    
+    <!-- TOP SCADA OPERATIONAL BAR (56px) -->
+    <header class="h-14 bg-paper border-b border-rule px-6 flex items-center justify-between shrink-0 z-20">
+      
+      <!-- Left: Breadcrumb & Pond Selector -->
+      <div class="flex items-center gap-3">
+        <div class="flex items-center gap-1.5 text-xs text-neutral-400 font-mono">
+          <i data-lucide="layout-grid" class="w-3.5 h-3.5 text-neutral-500"></i>
+          <span>Overview</span>
         </div>
-        <div>
-          <div class="text-[11px] text-slate-500">Komoditas</div>
-          <div class="text-teal-700 font-semibold">Udang Vaname</div>
-        </div>
-        <div>
-          <div class="text-[11px] text-slate-500">Biomassa est.</div>
-          <div class="text-emerald-700 font-semibold">1.840 kg</div>
-        </div>
-        <div>
-          <div class="text-[11px] text-slate-500">Target panen</div>
-          <div class="text-slate-800 font-semibold">Size 45 / kg</div>
+
+        <span class="text-neutral-600">/</span>
+
+        <div class="flex items-center gap-1.5 bg-paper-2 px-2.5 py-1.5 rounded-lg border border-rule text-xs">
+          <i data-lucide="map-pin" class="w-3.5 h-3.5 text-neutral-500"></i>
+          <select id="pondSelector" class="bg-transparent font-medium text-neutral-200 focus:outline-none cursor-pointer">
+            <option value="Kolam A" class="bg-paper-2">Petak A1 (Vaname 1.200m²)</option>
+            <option value="Kolam B" class="bg-paper-2">Petak A2 (Vaname 1.000m²)</option>
+            <option value="Kolam C" class="bg-paper-2">Petak B1 (Nila Salin 800m²)</option>
+          </select>
         </div>
       </div>
 
-      <!-- Selector & Telemetry Status -->
-      <div class="flex items-center flex-wrap gap-2 text-xs">
-        <!-- Pond Picker -->
-        <div class="flex items-center gap-1.5 bg-slate-100 px-2.5 py-1.5 rounded border border-slate-200">
-          <span class="text-slate-500">Petak:</span>
-          <select id="pondSelector" class="bg-transparent font-medium text-slate-800 focus:outline-none cursor-pointer">
-            <option value="Kolam A" class="bg-white">Petak A1 (Vaname 1.200m²)</option>
-            <option value="Kolam B" class="bg-white">Petak A2 (Vaname 1.000m²)</option>
-            <option value="Kolam C" class="bg-white">Petak B1 (Nila Salin)</option>
+      <!-- Right: Role & Live Clock -->
+      <div class="flex items-center gap-3 text-xs">
+        <div class="flex items-center gap-1.5 bg-paper-2 px-2.5 py-1.5 rounded-lg border border-rule">
+          <i data-lucide="shield" class="w-3.5 h-3.5 text-neutral-500"></i>
+          <span class="text-neutral-400">Peran:</span>
+          <select id="userRoleSelector" class="bg-transparent font-medium text-amber-400 focus:outline-none cursor-pointer font-mono">
+            <option value="admin" class="bg-paper-2">Admin</option>
+            <option value="guru" selected class="bg-paper-2">Guru / Teknisi</option>
+            <option value="siswa" class="bg-paper-2">Siswa (Read-Only)</option>
           </select>
         </div>
 
-        <!-- Role Selector -->
-        <div class="flex items-center gap-1.5 bg-slate-100 px-2.5 py-1.5 rounded border border-slate-200">
-          <span class="text-slate-500">Peran:</span>
-          <select id="userRoleSelector" class="bg-transparent font-medium text-amber-800 focus:outline-none cursor-pointer font-mono">
-            <option value="admin" class="bg-white">Admin</option>
-            <option value="guru" selected class="bg-white">Guru / Teknisi</option>
-            <option value="siswa" class="bg-white">Siswa (Read-Only)</option>
-          </select>
-        </div>
-
-        <!-- Link Status -->
-        <div id="connectionStatusBadge" class="flex items-center gap-2 px-2.5 py-1.5 rounded bg-teal-50 border border-teal-200 text-teal-800 text-xs font-mono">
-          <span class="w-2 h-2 rounded-full bg-teal-500 animate-pulse"></span>
-          <span id="connectionStatusText">ESP32: Online</span>
-        </div>
-
-        <!-- Real-time Clock -->
-        <div class="hidden sm:flex items-center px-2.5 py-1.5 rounded bg-slate-100 border border-slate-200 text-slate-600 text-xs font-mono">
+        <div class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-paper-2 border border-rule text-neutral-400 font-mono">
+          <i data-lucide="clock" class="w-3.5 h-3.5 text-neutral-500"></i>
           <span id="liveClock">--:--:-- WIB</span>
         </div>
       </div>
 
-    </div>
-  </header>
+    </header>
 
-  <!-- NAVIGATION BAR (WIRU LIGHT MODE) -->
-  <div class="border-b border-slate-200 bg-white">
-    <div class="max-w-7xl mx-auto px-4 lg:px-8">
-      <nav class="flex space-x-1.5 overflow-x-auto py-2" id="mainTabs">
-        <button class="nav-tab active" data-tab="tab-cockpit">
-          Pond Cockpit (Digital Twin)
-        </button>
-        <button class="nav-tab" data-tab="tab-correlation">
-          Korelasi DO &amp; Kualitas Air
-        </button>
-        <button class="nav-tab" data-tab="tab-feeder">
-          Manajemen Pakan (Auto-Feeder)
-        </button>
-        <button class="nav-tab" data-tab="tab-hardware">
-          Box Kontroler &amp; Wiring
-        </button>
-        <button class="nav-tab" data-tab="tab-simulator">
-          Simulator Anomali Tambak
-        </button>
-        <button class="nav-tab" data-tab="tab-logs">
-          Log Kejadian &amp; Laporan
-        </button>
-        <button class="nav-tab" data-tab="tab-trainer">
-          Trainer Kit Vokasi
-        </button>
-      </nav>
-    </div>
-  </div>
+    <!-- SCROLLABLE WORKBENCH BODY (Padding 24px/6) -->
+    <main class="flex-1 overflow-y-auto p-6 space-y-6">
 
-  <!-- MAIN SCADA WORKBENCH -->
-  <main class="max-w-7xl mx-auto w-full px-4 lg:px-8 py-5 flex-1 space-y-5">
-
-    <!-- CRITICAL ALERT CALLOUT (Hanya Tampil Bila DO Rendah / Anomali) -->
-    <div id="dynamicAlertBanner" class="hidden rounded border border-red-300 bg-red-50 p-3.5 transition-colors flex items-start justify-between gap-3 font-mono text-xs text-red-900">
-      <div class="flex items-start gap-3">
-        <div class="w-5 h-5 text-red-600 shrink-0 mt-0.5">
-          <i data-lucide="alert-octagon" class="w-5 h-5"></i>
+      <!-- CRITICAL ALERT CALLOUT (Hanya Tampil Bila DO Rendah / Anomali) -->
+      <div id="dynamicAlertBanner" class="hidden rounded-xl border border-red-500/30 bg-red-950/30 p-3.5 transition-colors flex items-start justify-between gap-3 font-mono text-xs text-red-300">
+        <div class="flex items-start gap-3">
+          <div class="w-5 h-5 text-red-400 shrink-0 mt-0.5">
+            <i data-lucide="alert-octagon" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div id="alertTitle" class="font-bold text-red-200">Peringatan anoksia: Oksigen terlarut di bawah 5.00 mg/L</div>
+            <p id="alertDescription" class="text-red-300/80 mt-1 leading-relaxed">
+              Kadar DO kolam merosot. Relai kincir aerator otomatis dinyalakan dan notifikasi darurat telah dipancarkan ke WhatsApp teknisi tambak.
+            </p>
+          </div>
         </div>
+        <button id="dismissAlertBtn" class="px-2.5 py-1 rounded bg-red-900/40 hover:bg-red-900/60 text-red-200 font-semibold border border-red-500/30">
+          Tutup
+        </button>
+      </div>
+
+      <!-- Unslop Signature Page Headline (Matching "October 2026" from references/refs) -->
+      <div class="flex flex-wrap items-baseline justify-between gap-3">
         <div>
-          <div id="alertTitle" class="font-bold text-red-900">Peringatan anoksia: Oksigen terlarut di bawah 5.00 mg/L</div>
-          <p id="alertDescription" class="text-red-700 mt-1 leading-relaxed">
-            Kadar DO kolam merosot. Relai kincir aerator otomatis dinyalakan dan notifikasi darurat telah dipancarkan ke WhatsApp teknisi tambak.
-          </p>
+          <h1 class="text-3xl font-medium tracking-tight text-ink">Tambak Puger <span class="text-neutral-500 font-normal">DOC 42</span></h1>
+          <p class="text-xs text-neutral-400 mt-1 font-mono">Petak A1 / Udang Vaname / Biomassa 1.840 kg / Target Size 45</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono bg-teal-500/10 text-teal-400 border border-teal-500/20">
+            <span class="w-1.5 h-1.5 rounded-full bg-teal-400"></span>
+            Sistem Aktif (Siklus II)
+          </span>
         </div>
       </div>
-      <button id="dismissAlertBtn" class="px-2.5 py-1 rounded bg-red-100 hover:bg-red-200 text-red-900 font-semibold">
-        Tutup
-      </button>
-    </div>
 
-    <!-- ========================================================================= -->
-    <!-- TAB 1: POND COCKPIT (DIGITAL TWIN + PARAMETRIC MATRIX)                   -->
-    <!-- ========================================================================= -->
-    <div id="tab-cockpit" class="tab-content space-y-5">
-
-      <!-- 5 Water Quality Parameter Cells (Baris Presisi Atas) -->
-      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+      <!-- 5 Water Quality Parameter Cells (Unslop Stat Card Reference Craft) -->
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3.5">
 
         <!-- DO (Dissolved Oxygen) - Parameter Utama Akuakultur -->
-        <div class="telemetry-cell border-teal-300" id="card-do">
-          <div class="flex items-center justify-between text-slate-500 mb-1">
-            <span class="text-xs font-semibold text-teal-700">Oksigen (DO)</span>
-            <span id="badge-do" class="text-[10px] px-1.5 py-0.5 rounded bg-teal-100 text-teal-800 font-mono font-semibold">Optimal</span>
+        <div class="telemetry-cell" id="card-do">
+          <div class="flex items-center justify-between text-neutral-400 mb-1">
+            <span class="text-xs text-neutral-400 font-medium">Oksigen terlarut (DO)</span>
+            <span id="badge-do" class="text-[10px] px-1.5 py-0.5 rounded bg-teal-500/15 text-teal-300 font-mono">Optimal</span>
           </div>
-          <div class="flex items-baseline gap-1.5">
-            <span id="val-do" class="text-3xl font-bold font-mono text-wiru-navy">5.40</span>
-            <span class="text-xs text-slate-500 font-mono">mg/L</span>
+          <div class="flex items-baseline gap-1.5 my-1">
+            <span id="val-do" class="text-3xl font-medium tracking-tight font-mono text-ink tabular-nums">5.40</span>
+            <span class="text-xs text-neutral-400 font-mono">mg/L</span>
           </div>
-          <div class="mt-2 text-[11px] text-slate-500 flex justify-between font-mono">
-            <span>Batas kritis: 5.00</span>
-            <span class="text-teal-700 font-bold">&plusmn;0.05</span>
+          <div class="mt-2 text-[11px] text-emerald-400 font-mono flex justify-between">
+            <span>+0.40 vs kemarin</span>
+            <span class="text-neutral-500">Kritis &lt; 5.0</span>
           </div>
         </div>
 
         <!-- Suhu Air -->
         <div class="telemetry-cell" id="card-temp">
-          <div class="flex items-center justify-between text-slate-500 mb-1">
-            <span class="text-xs font-semibold text-slate-700">Suhu air</span>
-            <span id="badge-temp" class="text-[10px] px-1.5 py-0.5 rounded bg-teal-100 text-teal-800 font-mono font-semibold">Normal</span>
+          <div class="flex items-center justify-between text-neutral-400 mb-1">
+            <span class="text-xs text-neutral-400 font-medium">Suhu air</span>
+            <span id="badge-temp" class="text-[10px] px-1.5 py-0.5 rounded bg-teal-500/15 text-teal-300 font-mono">Normal</span>
           </div>
-          <div class="flex items-baseline gap-1.5">
-            <span id="val-temp" class="text-3xl font-bold font-mono text-wiru-navy">28.5</span>
-            <span class="text-xs text-slate-500 font-mono">°C</span>
+          <div class="flex items-baseline gap-1.5 my-1">
+            <span id="val-temp" class="text-3xl font-medium tracking-tight font-mono text-ink tabular-nums">28.5</span>
+            <span class="text-xs text-neutral-400 font-mono">°C</span>
           </div>
-          <div class="mt-2 text-[11px] text-slate-500 flex justify-between font-mono">
+          <div class="mt-2 text-[11px] text-neutral-400 font-mono flex justify-between">
             <span>Ideal: 28 - 31°C</span>
-            <span>DS18B20</span>
+            <span class="text-neutral-500">DS18B20</span>
           </div>
         </div>
 
         <!-- pH Air -->
         <div class="telemetry-cell" id="card-ph">
-          <div class="flex items-center justify-between text-slate-500 mb-1">
-            <span class="text-xs font-semibold text-slate-700">pH air</span>
-            <span id="badge-ph" class="text-[10px] px-1.5 py-0.5 rounded bg-teal-100 text-teal-800 font-mono font-semibold">Normal</span>
+          <div class="flex items-center justify-between text-neutral-400 mb-1">
+            <span class="text-xs text-neutral-400 font-medium">pH air</span>
+            <span id="badge-ph" class="text-[10px] px-1.5 py-0.5 rounded bg-teal-500/15 text-teal-300 font-mono">Normal</span>
           </div>
-          <div class="flex items-baseline gap-1.5">
-            <span id="val-ph" class="text-3xl font-bold font-mono text-wiru-navy">7.40</span>
-            <span class="text-xs text-slate-500 font-mono">pH</span>
+          <div class="flex items-baseline gap-1.5 my-1">
+            <span id="val-ph" class="text-3xl font-medium tracking-tight font-mono text-ink tabular-nums">7.40</span>
+            <span class="text-xs text-neutral-400 font-mono">pH</span>
           </div>
-          <div class="mt-2 text-[11px] text-slate-500 flex justify-between font-mono">
+          <div class="mt-2 text-[11px] text-neutral-400 font-mono flex justify-between">
             <span>Target: 7.5 - 8.2</span>
-            <span>Elektroda Gelas</span>
+            <span class="text-neutral-500">Elektroda</span>
           </div>
         </div>
 
         <!-- Salinitas -->
         <div class="telemetry-cell" id="card-salinity">
-          <div class="flex items-center justify-between text-slate-500 mb-1">
-            <span class="text-xs font-semibold text-slate-700">Salinitas</span>
-            <span id="badge-salinity" class="text-[10px] px-1.5 py-0.5 rounded bg-teal-100 text-teal-800 font-mono font-semibold">Normal</span>
+          <div class="flex items-center justify-between text-neutral-400 mb-1">
+            <span class="text-xs text-neutral-400 font-medium">Salinitas</span>
+            <span id="badge-salinity" class="text-[10px] px-1.5 py-0.5 rounded bg-teal-500/15 text-teal-300 font-mono">Normal</span>
           </div>
-          <div class="flex items-baseline gap-1.5">
-            <span id="val-salinity" class="text-3xl font-bold font-mono text-wiru-navy">18</span>
-            <span class="text-xs text-slate-500 font-mono">ppt</span>
+          <div class="flex items-baseline gap-1.5 my-1">
+            <span id="val-salinity" class="text-3xl font-medium tracking-tight font-mono text-ink tabular-nums">18</span>
+            <span class="text-xs text-neutral-400 font-mono">ppt</span>
           </div>
-          <div class="mt-2 text-[11px] text-slate-500 flex justify-between font-mono">
+          <div class="mt-2 text-[11px] text-neutral-400 font-mono flex justify-between">
             <span>Air Payau Puger</span>
-            <span>Probe TDS/Sal</span>
+            <span class="text-neutral-500">TDS/Sal</span>
           </div>
         </div>
 
         <!-- Kekeruhan (Turbidity) -->
         <div class="telemetry-cell" id="card-turbidity">
-          <div class="flex items-center justify-between text-slate-500 mb-1">
-            <span class="text-xs font-semibold text-slate-700">Kekeruhan</span>
-            <span id="badge-turbidity" class="text-[10px] px-1.5 py-0.5 rounded bg-teal-100 text-teal-800 font-mono font-semibold">Sehat</span>
+          <div class="flex items-center justify-between text-neutral-400 mb-1">
+            <span class="text-xs text-neutral-400 font-medium">Kekeruhan</span>
+            <span id="badge-turbidity" class="text-[10px] px-1.5 py-0.5 rounded bg-teal-500/15 text-teal-300 font-mono">Sehat</span>
           </div>
-          <div class="flex items-baseline gap-1.5">
-            <span id="val-turbidity" class="text-3xl font-bold font-mono text-wiru-navy">32</span>
-            <span class="text-xs text-slate-500 font-mono">NTU</span>
+          <div class="flex items-baseline gap-1.5 my-1">
+            <span id="val-turbidity" class="text-3xl font-medium tracking-tight font-mono text-ink tabular-nums">32</span>
+            <span class="text-xs text-neutral-400 font-mono">NTU</span>
           </div>
-          <div class="mt-2 text-[11px] text-slate-500 flex justify-between font-mono">
+          <div class="mt-2 text-[11px] text-neutral-400 font-mono flex justify-between">
             <span>Secchi Disc: ~35cm</span>
-            <span>Optik 650nm</span>
+            <span class="text-neutral-500">650nm</span>
           </div>
         </div>
 
       </div>
 
-      <!-- MAIN SPLIT WORKBENCH: Digital Twin Canvas (Kiri) + Actuator Command Center (Kanan) -->
+      <!-- ========================================================================= -->
+      <!-- TAB 1: POND COCKPIT (DIGITAL TWIN + PARAMETRIC MATRIX)                   -->
+      <!-- ========================================================================= -->
+      <div id="tab-cockpit" class="tab-content space-y-5">
+
+        <!-- MAIN SPLIT WORKBENCH: Digital Twin Canvas (Kiri) + Actuator Command Center (Kanan) -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
 
         <!-- Kiri (8 Cols): Digital Twin Canvas Kolam Tambak -->
@@ -400,38 +460,44 @@
     </div>
 
     <!-- ========================================================================= -->
-    <!-- TAB 2: KORELASI DO & KUALITAS AIR (JALA TECH SIGNATURE)                   -->
+    <!-- TAB 2: KORELASI DO & KUALITAS AIR (UNSLOP REVENUE-CHART CRAFT)            -->
     <!-- ========================================================================= -->
     <div id="tab-correlation" class="tab-content hidden space-y-5">
 
       <div class="scada-panel space-y-4">
-        <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-baseline justify-between gap-3">
           <div>
-            <h2 class="text-base font-bold text-wiru-navy font-mono">Matriks Korelasi DO vs Pakan vs Kincir</h2>
-            <p class="text-xs text-slate-500 mt-0.5">
-              Fenomena biologi tambak: Saat pakan ditebar (feeding event), metabolisme udang meningkat tajam sehingga oksigen terlarut turun. WIRU mendeteksi dan mengaktifkan kincir aerator secara presisi.
-            </p>
+            <div class="text-xs text-neutral-400 font-mono">Revenue &amp; Parameter Trajectory</div>
+            <div class="flex items-baseline gap-2 mt-0.5">
+              <span class="text-3xl font-medium tracking-tight text-ink font-mono">$124,860</span>
+              <span class="text-xs text-neutral-400 font-mono">indeks produksi</span>
+            </div>
+            <div class="text-xs text-emerald-400 font-mono mt-1">4.2% &uarr; vs September</div>
           </div>
           <div class="flex items-center gap-2">
-            <span class="text-xs px-2.5 py-1 rounded bg-slate-100 border border-slate-200 text-slate-600 font-mono">Stream 5 Detik</span>
-            <button id="clearChartBtn" class="scada-btn">
+            <span class="text-xs px-2.5 py-1 rounded-full bg-paper-3 border border-rule text-neutral-400 font-mono">Real-time Stream</span>
+            <button id="clearChartBtn" class="scada-btn font-mono">
               Reset Riwayat
             </button>
           </div>
         </div>
 
-        <!-- Canvas Multi-Parameter Chart -->
-        <div class="relative w-full h-80 bg-white p-3 rounded border border-slate-200">
-          <canvas id="aquacultureChart" aria-label="Grafik Oksigen Terlarut dan Suhu Kolam"></canvas>
+        <!-- Canvas Multi-Parameter Chart (100% Dark Seamless, No White Box) -->
+        <div class="relative w-full h-[360px] pt-1">
+          <canvas id="aquacultureChart" aria-label="Grafik Multi-Parameter Kualitas Kolam"></canvas>
         </div>
 
-        <div class="flex flex-wrap items-center justify-between gap-4 pt-2 border-t border-slate-200 text-xs font-mono text-slate-500">
-          <div class="flex items-center gap-4">
-            <span class="flex items-center gap-1.5"><span class="w-3 h-0.5 bg-teal-600 rounded"></span> Oksigen Terlarut (DO)</span>
-            <span class="flex items-center gap-1.5"><span class="w-3 h-0.5 bg-rose-500 rounded"></span> Suhu Air (°C)</span>
-            <span class="flex items-center gap-1.5"><span class="w-3 h-0.5 border-t border-dashed border-red-500"></span> Ambang Kritis 5.00 mg/L</span>
+        <!-- Series Legend (Matching Unslop Reference) -->
+        <div class="flex flex-wrap items-center justify-between gap-4 pt-3 border-t border-rule text-xs font-mono text-neutral-400">
+          <div class="flex flex-wrap items-center gap-4">
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-0.5 bg-amber-400 rounded"></span> Oksigen (DO Peak)</span>
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-0.5 bg-emerald-400 rounded"></span> Biomassa Vaname</span>
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-0.5 bg-sky-400 rounded"></span> Suhu Air (28.5&deg;C)</span>
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-0.5 bg-rose-400 rounded"></span> Derajat pH (7.4)</span>
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-0.5 bg-purple-400 rounded"></span> Salinitas Air</span>
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-0.5 bg-neutral-600 rounded"></span> Komparasi Siklus I (Mirror)</span>
           </div>
-          <span id="chartLastUpdated" class="italic">Diperbarui: baru saja</span>
+          <span id="chartLastUpdated" class="text-neutral-500 text-[11px]">Diperbarui: baru saja</span>
         </div>
       </div>
 
@@ -934,10 +1000,11 @@ void evaluasiOksigen(float kadarDO) {
     </div>
 
   </main>
+</div>
 
-  <!-- TOAST CONTAINER -->
-  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 space-y-2 pointer-events-none"></div>
+  <!-- TOAST CONTAINER (Top Center Floating Pill) -->
+  <div id="toastContainer" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 space-y-2 pointer-events-none flex flex-col items-center"></div>
 
-  <script src="app.js?v=2.1"></script>
+  <script src="app.js?v=3.1"></script>
 </body>
 </html>

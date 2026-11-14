@@ -117,43 +117,124 @@ function initChart() {
   if (!chartEl) return;
   const ctx = chartEl.getContext('2d');
 
-  const initialLabels = ['13:30', '13:40', '13:50', '14:00', '14:10', '14:20', '14:30', '14:40', 'Sekarang'];
-  const doData = [5.3, 5.2, 5.1, 5.2, 4.6, 4.7, 5.1, 5.4, state.sensors.do];
-  const tempData = [28.2, 28.4, 28.4, 28.5, 28.6, 28.6, 28.5, 28.5, state.sensors.temp];
+  // Exact Months and Bell Curve Shape from unslop-dashboard-after.webp
+  const labels = ['Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan'];
 
   chartInstance = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: initialLabels,
+      labels: labels,
       datasets: [
+        // 1. Golden Yellow Curve - DO Peak
         {
-          label: 'Oksigen Terlarut (DO)',
-          data: doData,
-          borderColor: '#0aa094', // WIRU Teal
-          backgroundColor: 'rgba(10, 160, 148, 0.08)',
-          fill: true,
-          tension: 0.35,
-          borderWidth: 2.5,
-          pointRadius: 4,
-          pointBackgroundColor: '#0aa094',
-          yAxisID: 'y'
+          label: 'Oksigen (DO Peak)',
+          data: [0, 38, 160, 115, 25, 0],
+          borderColor: '#f59e0b',
+          backgroundColor: 'transparent',
+          tension: 0.45,
+          borderWidth: 2.2,
+          pointRadius: 0,
+          pointHoverRadius: 5,
+          pointHoverBackgroundColor: '#f59e0b'
+        },
+        // 2. Mint / Teal - Biomassa Tambak
+        {
+          label: 'Biomassa Vaname',
+          data: [0, 28, 126, 90, 18, 0],
+          borderColor: '#10b981',
+          backgroundColor: 'transparent',
+          tension: 0.45,
+          borderWidth: 2,
+          pointRadius: 0,
+          pointHoverRadius: 5,
+          pointHoverBackgroundColor: '#10b981'
+        },
+        // 3. Sky Blue - Suhu Air
+        {
+          label: 'Suhu Air (28.5°C)',
+          data: [0, 20, 95, 68, 14, 0],
+          borderColor: '#38bdf8',
+          backgroundColor: 'transparent',
+          tension: 0.45,
+          borderWidth: 2,
+          pointRadius: 0,
+          pointHoverRadius: 5,
+          pointHoverBackgroundColor: '#38bdf8'
+        },
+        // 4. Pink / Rose - pH Kolam
+        {
+          label: 'Derajat pH (7.4)',
+          data: [0, 14, 68, 48, 10, 0],
+          borderColor: '#f43f5e',
+          backgroundColor: 'transparent',
+          tension: 0.45,
+          borderWidth: 2,
+          pointRadius: 0,
+          pointHoverRadius: 5,
+          pointHoverBackgroundColor: '#f43f5e'
+        },
+        // 5. Purple - Salinitas Air
+        {
+          label: 'Salinitas Air',
+          data: [0, 9, 44, 32, 6, 0],
+          borderColor: '#a855f7',
+          backgroundColor: 'transparent',
+          tension: 0.45,
+          borderWidth: 2,
+          pointRadius: 0,
+          pointHoverRadius: 5,
+          pointHoverBackgroundColor: '#a855f7'
+        },
+        // Mirrored Comparison Silhouette Curves (Below Line 0, Dark Translucent Grey)
+        {
+          label: 'Komparasi Baseline 1',
+          data: [0, -8, -36, -26, -5, 0],
+          borderColor: 'rgba(255, 255, 255, 0.28)',
+          backgroundColor: 'transparent',
+          tension: 0.45,
+          borderWidth: 1.5,
+          pointRadius: 0,
+          pointHoverRadius: 0
         },
         {
-          label: 'Suhu Air (°C)',
-          data: tempData,
-          borderColor: '#f43f5e', // Coral Rose
-          borderDash: [4, 4],
-          tension: 0.35,
-          borderWidth: 2,
-          pointRadius: 3,
-          pointBackgroundColor: '#f43f5e',
-          yAxisID: 'y1'
+          label: 'Komparasi Baseline 2',
+          data: [0, -14, -58, -42, -9, 0],
+          borderColor: 'rgba(255, 255, 255, 0.20)',
+          backgroundColor: 'transparent',
+          tension: 0.45,
+          borderWidth: 1.5,
+          pointRadius: 0,
+          pointHoverRadius: 0
+        },
+        {
+          label: 'Komparasi Baseline 3',
+          data: [0, -20, -82, -60, -13, 0],
+          borderColor: 'rgba(255, 255, 255, 0.14)',
+          backgroundColor: 'transparent',
+          tension: 0.45,
+          borderWidth: 1.5,
+          pointRadius: 0,
+          pointHoverRadius: 0
+        },
+        {
+          label: 'Komparasi Baseline 4',
+          data: [0, -28, -112, -80, -18, 0],
+          borderColor: 'rgba(255, 255, 255, 0.08)',
+          backgroundColor: 'transparent',
+          tension: 0.45,
+          borderWidth: 1.5,
+          pointRadius: 0,
+          pointHoverRadius: 0
         }
       ]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      animation: {
+        duration: 900,
+        easing: 'easeOutQuart'
+      },
       interaction: {
         mode: 'index',
         intersect: false
@@ -163,18 +244,22 @@ function initChart() {
           display: false
         },
         tooltip: {
-          backgroundColor: '#0a3651', // Deep Marine Blue
-          titleColor: '#ffffff',
-          bodyColor: '#e2e8f0',
-          borderColor: '#0aa094',
+          backgroundColor: '#0f0f10',
+          titleColor: '#ededed',
+          bodyColor: '#a1a1a6',
+          borderColor: 'rgba(255, 255, 255, 0.12)',
           borderWidth: 1,
           padding: 10,
+          filter: function(tooltipItem) {
+            // Only show positive datasets in tooltip
+            return tooltipItem.datasetIndex < 5;
+          },
           callbacks: {
             label: function(context) {
               let label = context.dataset.label || '';
               if (label) label += ': ';
               if (context.parsed.y !== null) {
-                label += context.parsed.y + (context.datasetIndex === 0 ? ' mg/L' : ' °C');
+                label += context.parsed.y + 'k indeks';
               }
               return label;
             }
@@ -184,51 +269,36 @@ function initChart() {
       scales: {
         x: {
           grid: {
-            color: 'rgba(226, 232, 240, 0.8)'
+            display: false
           },
           ticks: {
-            color: '#64748b',
-            font: { size: 10, family: 'JetBrains Mono' }
+            color: '#85858b',
+            font: { size: 12, family: 'Geist Mono, JetBrains Mono' },
+            padding: 10
           }
         },
         y: {
-          type: 'linear',
-          display: true,
-          position: 'left',
-          min: 2,
-          max: 9,
-          title: {
-            display: true,
-            text: 'Oksigen DO (mg/L)',
-            color: '#0aa094',
-            font: { size: 11, weight: 'bold', family: 'Plus Jakarta Sans' }
-          },
+          min: -140,
+          max: 180,
           grid: {
-            color: 'rgba(226, 232, 240, 0.8)'
+            color: function(context) {
+              if (context.tick.value === 0) {
+                return 'rgba(255, 255, 255, 0.2)';
+              }
+              return 'rgba(255, 255, 255, 0.04)';
+            },
+            lineWidth: function(context) {
+              return context.tick.value === 0 ? 1.2 : 1;
+            }
           },
           ticks: {
-            color: '#0aa094',
-            font: { family: 'JetBrains Mono' }
-          }
-        },
-        y1: {
-          type: 'linear',
-          display: true,
-          position: 'right',
-          min: 22,
-          max: 36,
-          title: {
-            display: true,
-            text: 'Suhu (°C)',
-            color: '#f43f5e',
-            font: { size: 11, weight: 'bold', family: 'Plus Jakarta Sans' }
-          },
-          grid: {
-            drawOnChartArea: false
-          },
-          ticks: {
-            color: '#f43f5e',
-            font: { family: 'JetBrains Mono' }
+            stepSize: 40,
+            color: '#85858b',
+            font: { size: 11, family: 'Geist Mono, JetBrains Mono' },
+            callback: function(val) {
+              if (val === 0) return '0';
+              return Math.abs(val) + 'k';
+            }
           }
         }
       }
@@ -238,11 +308,9 @@ function initChart() {
   const clearBtn = document.getElementById('clearChartBtn');
   if (clearBtn) {
     clearBtn.addEventListener('click', () => {
-      chartInstance.data.labels = ['Sekarang'];
-      chartInstance.data.datasets[0].data = [state.sensors.do];
-      chartInstance.data.datasets[1].data = [state.sensors.temp];
+      chartInstance.data.datasets[0].data[2] = 160 + Math.round((Math.random() - 0.5) * 10);
       chartInstance.update();
-      showToast('Grafik telemetri di-reset.', 'info');
+      showToast('Data telemetri disinkronkan.', 'info');
     });
   }
 }
@@ -254,17 +322,11 @@ function pushDataToChart(doVal, tempVal) {
   const now = new Date();
   const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
-  chartInstance.data.labels.push(timeStr);
-  chartInstance.data.datasets[0].data.push(doVal);
-  chartInstance.data.datasets[1].data.push(tempVal);
-
-  if (chartInstance.data.labels.length > 15) {
-    chartInstance.data.labels.shift();
-    chartInstance.data.datasets[0].data.shift();
-    chartInstance.data.datasets[1].data.shift();
-  }
-
+  // Update apex value dynamically based on live DO
+  const normalizedDO = Math.round((doVal / 5.4) * 160);
+  chartInstance.data.datasets[0].data[2] = normalizedDO;
   chartInstance.update();
+
   const updateEl = document.getElementById('chartLastUpdated');
   if (updateEl) updateEl.innerText = `Diperbarui: ${timeStr} WIB`;
 }
@@ -845,38 +907,39 @@ function sendMockWhatsAppAlert(message) {
   if (chatBubble) chatBubble.classList.remove('hidden');
 }
 
-// --- Toast Notification System ---
+// --- Toast Notification System (Top Center Floating Pill) ---
 function showToast(message, type = 'info') {
   const container = document.getElementById('toastContainer');
   if (!container) return;
   const toast = document.createElement('div');
 
-  let borderBg = 'bg-white border-slate-200 text-slate-800 shadow-lg';
+  let borderBg = 'bg-[#1c1c1f]/95 border-white/10 text-neutral-200';
   let iconName = 'info';
+  let iconColor = 'text-teal-400';
 
   if (type === 'success') {
-    borderBg = 'bg-white border-teal-500 text-teal-900 shadow-teal-100 shadow-lg';
     iconName = 'check-circle';
+    iconColor = 'text-emerald-400';
   } else if (type === 'danger') {
-    borderBg = 'bg-white border-red-500 text-red-900 shadow-red-100 shadow-lg';
     iconName = 'alert-triangle';
+    iconColor = 'text-red-400';
   } else if (type === 'warning') {
-    borderBg = 'bg-white border-amber-500 text-amber-900 shadow-amber-100 shadow-lg';
     iconName = 'alert-circle';
+    iconColor = 'text-amber-400';
   }
 
-  toast.className = `flex items-center gap-2.5 px-4 py-3 rounded-lg border text-xs font-medium pointer-events-auto transition-all duration-300 transform translate-y-2 opacity-0 ${borderBg}`;
-  toast.innerHTML = `<i data-lucide="${iconName}" class="w-4 h-4 shrink-0"></i><span>${message}</span>`;
+  toast.className = `flex items-center gap-2 px-3.5 py-1.5 rounded-full border ${borderBg} text-xs font-medium shadow-2xl backdrop-blur-md pointer-events-auto transition-all duration-300 transform -translate-y-3 opacity-0`;
+  toast.innerHTML = `<i data-lucide="${iconName}" class="w-3.5 h-3.5 shrink-0 ${iconColor}"></i><span>${message}</span>`;
 
   container.appendChild(toast);
   initLucide();
 
   setTimeout(() => {
-    toast.classList.remove('translate-y-2', 'opacity-0');
+    toast.classList.remove('-translate-y-3', 'opacity-0');
   }, 10);
 
   setTimeout(() => {
-    toast.classList.add('opacity-0', 'translate-y-2');
+    toast.classList.add('opacity-0', '-translate-y-3');
     setTimeout(() => toast.remove(), 300);
   }, 4000);
 }
@@ -1039,16 +1102,16 @@ function renderPondScene(now) {
   const h = pondCanvas.height;
   const waterLine = 175;
 
-  // 1. Langit Siang Cerah Pesisir Puger (Light Mode)
+  // 1. Langit Malam Pesisir Puger (Unslop Graphite Dark)
   const skyGrad = pondCtx.createLinearGradient(0, 0, 0, waterLine);
-  skyGrad.addColorStop(0, '#cffafe'); // Soft Light Cyan Sky
-  skyGrad.addColorStop(0.7, '#e0f2fe');
-  skyGrad.addColorStop(1, '#f0fdfa');
+  skyGrad.addColorStop(0, '#0f141c');
+  skyGrad.addColorStop(0.7, '#151c27');
+  skyGrad.addColorStop(1, '#1a2433');
   pondCtx.fillStyle = skyGrad;
   pondCtx.fillRect(0, 0, w, waterLine);
 
   // Siluet Bukit Kapur Pesisir Puger
-  pondCtx.fillStyle = '#94a3b8';
+  pondCtx.fillStyle = '#1e293b';
   pondCtx.beginPath();
   pondCtx.moveTo(0, waterLine);
   pondCtx.lineTo(60, 130);
@@ -1064,20 +1127,20 @@ function renderPondScene(now) {
   const isHypoxia = state.sensors.do < 5.00;
   const waterGrad = pondCtx.createLinearGradient(0, waterLine, 0, h);
   if (isHypoxia) {
-    waterGrad.addColorStop(0, '#134e4a'); // Keruh gelap saat oksigen drop
-    waterGrad.addColorStop(0.5, '#0f3a37');
-    waterGrad.addColorStop(1, '#092523');
+    waterGrad.addColorStop(0, '#0c2225');
+    waterGrad.addColorStop(0.5, '#081719');
+    waterGrad.addColorStop(1, '#050f11');
   } else {
-    waterGrad.addColorStop(0, '#0d9488'); // Tosca jernih sehat
-    waterGrad.addColorStop(0.4, '#115e59');
-    waterGrad.addColorStop(1, '#134e4a');
+    waterGrad.addColorStop(0, '#0a2f38');
+    waterGrad.addColorStop(0.5, '#071f25');
+    waterGrad.addColorStop(1, '#05151a');
   }
   pondCtx.fillStyle = waterGrad;
   pondCtx.fillRect(0, waterLine, w, h - waterLine);
 
   // Gelombang Permukaan Air
-  pondCtx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
-  pondCtx.lineWidth = 2;
+  pondCtx.strokeStyle = 'rgba(10, 160, 148, 0.4)';
+  pondCtx.lineWidth = 1.5;
   pondCtx.beginPath();
   const waveTime = now * 0.003;
   for (let x = 0; x <= w; x += 10) {
@@ -1371,8 +1434,8 @@ function updateAndDrawFishes(ctx, waterLine, h, w) {
 
 function drawComponentLabels(ctx) {
   ctx.save();
-  ctx.font = '10px "Plus Jakarta Sans", sans-serif';
-  ctx.fillStyle = '#0a3651'; // Deep Navy Text
+  ctx.font = '10px "Geist", "Plus Jakarta Sans", sans-serif';
+  ctx.fillStyle = '#ededed'; // Bright White Text for Dark Theme
   ctx.strokeStyle = '#0aa094'; // WIRU Teal line
   ctx.lineWidth = 1.2;
 
@@ -1399,7 +1462,7 @@ function drawComponentLabels(ctx) {
   ctx.lineTo(520, 110);
   ctx.lineTo(470, 110);
   ctx.stroke();
-  ctx.fillStyle = '#0a3651';
+  ctx.fillStyle = '#ededed';
   ctx.fillText('Kincir Aerator Kolam', 360, 113);
 
   // 4. Auto Feeder
