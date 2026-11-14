@@ -13,17 +13,17 @@ const state = {
   currentPond: 'Kolam A',
   sensors: {
     temp: 28.5,
-    ph: 7.4,
+    ph: 7.40,
     salinity: 18,
-    do: 5.4,
+    do: 5.40,
     turbidity: 32
   },
   thresholds: {
-    doMin: 5.0,
+    doMin: 5.00,
     tempMin: 26.0,
     tempMax: 31.0,
-    phMin: 7.0,
-    phMax: 8.5,
+    phMin: 7.00,
+    phMax: 8.50,
     salinityMin: 15,
     salinityMax: 25,
     turbidityMax: 50
@@ -34,30 +34,31 @@ const state = {
     feederAuto: true
   },
   logs: [
-    { time: '14:00:00', event: 'Sistem Terhubung', param: 'DO: 5.2 mg/L', action: 'Monitoring Berkala Aktif', status: 'Normal' },
-    { time: '14:10:00', event: 'Oksigen Kolam Menurun', param: 'DO: 4.6 mg/L', action: 'Aerator Otomatis ON & Notifikasi WA Terkirim', status: 'Peringatan' },
-    { time: '14:40:00', event: 'Oksigen Kembali Stabil', param: 'DO: 5.4 mg/L', action: 'Aerator Mati Otomatis', status: 'Normal' }
+    { time: '14:00:00', event: 'Sistem Terhubung', param: 'DO: 5.20 mg/L', action: 'Monitoring Berkala Aktif', status: 'Normal' },
+    { time: '14:10:00', event: 'Oksigen Kolam Menurun', param: 'DO: 4.60 mg/L', action: 'Aerator Otomatis ON & Notifikasi WA Terkirim', status: 'Peringatan' },
+    { time: '14:40:00', event: 'Oksigen Kembali Stabil', param: 'DO: 5.40 mg/L', action: 'Aerator Mati Otomatis', status: 'Normal' }
   ]
 };
 
 let chartInstance = null;
 let streamInterval = null;
 let liveClockInterval = null;
+let siloRemainingKg = 15.6;
 
 // --- Inisialisasi Saat Dokumen Siap ---
 document.addEventListener('DOMContentLoaded', () => {
-  initLucide();
-  initClock();
-  initTabs();
-  initChart();
-  initControls();
-  initSliders();
-  initScenarios();
-  initTerminal();
-  initHardwareView();
-  renderLogs();
-  applyRolePermissions();
-  startAutoStream();
+  try { initLucide(); } catch (e) { console.warn('Lucide error:', e); }
+  try { initClock(); } catch (e) { console.warn('Clock error:', e); }
+  try { initTabs(); } catch (e) { console.warn('Tabs error:', e); }
+  try { initChart(); } catch (e) { console.warn('Chart error:', e); }
+  try { initControls(); } catch (e) { console.warn('Controls error:', e); }
+  try { initSliders(); } catch (e) { console.warn('Sliders error:', e); }
+  try { initScenarios(); } catch (e) { console.warn('Scenarios error:', e); }
+  try { initTerminal(); } catch (e) { console.warn('Terminal error:', e); }
+  try { initHardwareView(); } catch (e) { console.warn('Hardware view error:', e); }
+  try { renderLogs(); } catch (e) { console.warn('Logs error:', e); }
+  try { applyRolePermissions(); } catch (e) { console.warn('Role permissions error:', e); }
+  try { startAutoStream(); } catch (e) { console.warn('Auto stream error:', e); }
 
   console.log("WIRU (Water Intelligence for Raising Underwater life) Simulator Ready.");
 });
@@ -71,9 +72,12 @@ function initLucide() {
 // --- Live Clock Real-Time ---
 function initClock() {
   const clockEl = document.getElementById('liveClock');
+  if (!clockEl) return;
   function update() {
     const now = new Date();
-    clockEl.innerText = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' WIB';
+    if (clockEl) {
+      clockEl.innerText = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' WIB';
+    }
   }
   update();
   liveClockInterval = setInterval(update, 1000);
@@ -83,7 +87,8 @@ function initClock() {
 function initTabs() {
   const tabs = document.querySelectorAll('.nav-tab');
   tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
+    tab.addEventListener('click', (e) => {
+      e.preventDefault();
       tabs.forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
 
@@ -99,16 +104,18 @@ function initTabs() {
 
       // Re-trigger Chart resize and Lucide icons
       if ((targetId === 'tab-cockpit' || targetId === 'tab-correlation') && chartInstance) {
-        chartInstance.resize();
+        setTimeout(() => chartInstance.resize(), 50);
       }
       initLucide();
     });
   });
 }
 
-// --- Inisialisasi Chart.js ---
+// --- Inisialisasi Chart.js (WIRU Light Mode) ---
 function initChart() {
-  const ctx = document.getElementById('aquacultureChart').getContext('2d');
+  const chartEl = document.getElementById('aquacultureChart');
+  if (!chartEl) return;
+  const ctx = chartEl.getContext('2d');
 
   const initialLabels = ['13:30', '13:40', '13:50', '14:00', '14:10', '14:20', '14:30', '14:40', 'Sekarang'];
   const doData = [5.3, 5.2, 5.1, 5.2, 4.6, 4.7, 5.1, 5.4, state.sensors.do];
@@ -122,19 +129,19 @@ function initChart() {
         {
           label: 'Oksigen Terlarut (DO)',
           data: doData,
-          borderColor: '#22d3ee', // Cyan 400
-          backgroundColor: 'rgba(34, 211, 238, 0.1)',
+          borderColor: '#0aa094', // WIRU Teal
+          backgroundColor: 'rgba(10, 160, 148, 0.08)',
           fill: true,
           tension: 0.35,
           borderWidth: 2.5,
           pointRadius: 4,
-          pointBackgroundColor: '#06b6d4',
+          pointBackgroundColor: '#0aa094',
           yAxisID: 'y'
         },
         {
           label: 'Suhu Air (°C)',
           data: tempData,
-          borderColor: '#fb7185', // Rose 400
+          borderColor: '#f43f5e', // Coral Rose
           borderDash: [4, 4],
           tension: 0.35,
           borderWidth: 2,
@@ -156,18 +163,16 @@ function initChart() {
           display: false
         },
         tooltip: {
-          backgroundColor: '#0f172a',
-          titleColor: '#e2e8f0',
-          bodyColor: '#cbd5e1',
-          borderColor: '#334155',
+          backgroundColor: '#0a3651', // Deep Marine Blue
+          titleColor: '#ffffff',
+          bodyColor: '#e2e8f0',
+          borderColor: '#0aa094',
           borderWidth: 1,
           padding: 10,
           callbacks: {
             label: function(context) {
               let label = context.dataset.label || '';
-              if (label) {
-                label += ': ';
-              }
+              if (label) label += ': ';
               if (context.parsed.y !== null) {
                 label += context.parsed.y + (context.datasetIndex === 0 ? ' mg/L' : ' °C');
               }
@@ -179,11 +184,11 @@ function initChart() {
       scales: {
         x: {
           grid: {
-            color: 'rgba(51, 65, 85, 0.3)'
+            color: 'rgba(226, 232, 240, 0.8)'
           },
           ticks: {
-            color: '#94a3b8',
-            font: { size: 10 }
+            color: '#64748b',
+            font: { size: 10, family: 'JetBrains Mono' }
           }
         },
         y: {
@@ -195,14 +200,15 @@ function initChart() {
           title: {
             display: true,
             text: 'Oksigen DO (mg/L)',
-            color: '#22d3ee',
-            font: { size: 11, weight: 'bold' }
+            color: '#0aa094',
+            font: { size: 11, weight: 'bold', family: 'Plus Jakarta Sans' }
           },
           grid: {
-            color: 'rgba(51, 65, 85, 0.3)'
+            color: 'rgba(226, 232, 240, 0.8)'
           },
           ticks: {
-            color: '#22d3ee'
+            color: '#0aa094',
+            font: { family: 'JetBrains Mono' }
           }
         },
         y1: {
@@ -214,27 +220,31 @@ function initChart() {
           title: {
             display: true,
             text: 'Suhu (°C)',
-            color: '#fb7185',
-            font: { size: 11, weight: 'bold' }
+            color: '#f43f5e',
+            font: { size: 11, weight: 'bold', family: 'Plus Jakarta Sans' }
           },
           grid: {
             drawOnChartArea: false
           },
           ticks: {
-            color: '#fb7185'
+            color: '#f43f5e',
+            font: { family: 'JetBrains Mono' }
           }
         }
       }
     }
   });
 
-  document.getElementById('clearChartBtn').addEventListener('click', () => {
-    chartInstance.data.labels = ['Sekarang'];
-    chartInstance.data.datasets[0].data = [state.sensors.do];
-    chartInstance.data.datasets[1].data = [state.sensors.temp];
-    chartInstance.update();
-    showToast('Grafik berhasil di-reset.', 'info');
-  });
+  const clearBtn = document.getElementById('clearChartBtn');
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      chartInstance.data.labels = ['Sekarang'];
+      chartInstance.data.datasets[0].data = [state.sensors.do];
+      chartInstance.data.datasets[1].data = [state.sensors.temp];
+      chartInstance.update();
+      showToast('Grafik telemetri di-reset.', 'info');
+    });
+  }
 }
 
 // Update grafik dengan data terbaru
@@ -255,7 +265,8 @@ function pushDataToChart(doVal, tempVal) {
   }
 
   chartInstance.update();
-  document.getElementById('chartLastUpdated').innerText = `Diperbarui: ${timeStr} WIB`;
+  const updateEl = document.getElementById('chartLastUpdated');
+  if (updateEl) updateEl.innerText = `Diperbarui: ${timeStr} WIB`;
 }
 
 // --- Kontrol Perangkat & Aktuator ---
@@ -269,68 +280,87 @@ function initControls() {
   const dismissAlertBtn = document.getElementById('dismissAlertBtn');
 
   // Aerator Switch
-  switchAerator.addEventListener('change', (e) => {
-    setAeratorState(e.target.checked, 'Manual oleh ' + state.role.toUpperCase());
-  });
+  if (switchAerator) {
+    switchAerator.addEventListener('change', (e) => {
+      setAeratorState(e.target.checked, 'Manual oleh ' + state.role.toUpperCase());
+    });
+  }
 
   // Pump Switch
-  switchPump.addEventListener('change', (e) => {
-    state.actuators.pump = e.target.checked;
-    updateActuatorVisuals();
-    logEvent(e.target.checked ? 'Pompa Sirkulasi Dinyalakan' : 'Pompa Sirkulasi Dimatikan', '-', 'Manual switch');
-    showToast(e.target.checked ? 'Pompa sirkulasi aktif' : 'Pompa sirkulasi berhenti', 'info');
-  });
+  if (switchPump) {
+    switchPump.addEventListener('change', (e) => {
+      state.actuators.pump = e.target.checked;
+      updateActuatorVisuals();
+      logEvent(e.target.checked ? 'Pompa Sirkulasi Dinyalakan' : 'Pompa Sirkulasi Dimatikan', '-', 'Manual switch');
+      showToast(e.target.checked ? 'Pompa sirkulasi aktif' : 'Pompa sirkulasi berhenti', 'info');
+    });
+  }
 
   // Feeder Auto Switch
-  switchFeeder.addEventListener('change', (e) => {
-    state.actuators.feederAuto = e.target.checked;
-    logEvent(e.target.checked ? 'Jadwal Pakan Diaktifkan' : 'Jadwal Pakan Dinonaktifkan', 'Timer: 3x/hari', 'Setting');
-  });
+  if (switchFeeder) {
+    switchFeeder.addEventListener('change', (e) => {
+      state.actuators.feederAuto = e.target.checked;
+      logEvent(e.target.checked ? 'Jadwal Pakan Diaktifkan' : 'Jadwal Pakan Dinonaktifkan', 'Timer: 4x/hari', 'Setting');
+    });
+  }
 
   // Feed Now Manual Button
-  btnFeedNow.addEventListener('click', () => {
-    dispenseFeed();
-  });
+  if (btnFeedNow) {
+    btnFeedNow.addEventListener('click', () => {
+      dispenseFeed();
+    });
+  }
 
   // Role Selector
-  roleSelect.addEventListener('change', (e) => {
-    state.role = e.target.value;
-    applyRolePermissions();
-    showToast(`Beralih ke peran: ${e.target.selectedOptions[0].text}`, 'info');
-  });
+  if (roleSelect) {
+    roleSelect.addEventListener('change', (e) => {
+      state.role = e.target.value;
+      applyRolePermissions();
+      showToast(`Beralih ke peran: ${e.target.selectedOptions[0].text}`, 'info');
+    });
+  }
 
   // Pond Selector
-  pondSelect.addEventListener('change', (e) => {
-    state.currentPond = e.target.value;
-    logTerminal(`[APP] Memuat konfigurasi dan telemetri ${state.currentPond}...`, 'text-cyan-400');
-    showToast(`Memantau: ${state.currentPond}`, 'info');
-  });
+  if (pondSelect) {
+    pondSelect.addEventListener('change', (e) => {
+      state.currentPond = e.target.value;
+      logTerminal(`[APP] Memuat konfigurasi dan telemetri ${state.currentPond}...`, 'text-teal-600');
+      showToast(`Memantau: ${state.currentPond}`, 'info');
+    });
+  }
 
   // Dismiss alert
-  dismissAlertBtn.addEventListener('click', () => {
-    document.getElementById('dynamicAlertBanner').classList.add('hidden');
-  });
+  if (dismissAlertBtn) {
+    dismissAlertBtn.addEventListener('click', () => {
+      const banner = document.getElementById('dynamicAlertBanner');
+      if (banner) banner.classList.add('hidden');
+    });
+  }
 
   // Test WA
-  document.getElementById('btnSendTestWA').addEventListener('click', () => {
-    sendMockWhatsAppAlert("Uji Coba WIRU Gateway: Sistem Beroperasi Normal.");
-    showToast("Pesan uji coba dikirim ke chat preview", "success");
-  });
+  const testWaBtn = document.getElementById('btnSendTestWA');
+  if (testWaBtn) {
+    testWaBtn.addEventListener('click', () => {
+      sendMockWhatsAppAlert("Uji Coba WIRU Gateway: Sistem Beroperasi Normal.");
+      showToast("Pesan uji coba dikirim ke chat preview", "success");
+    });
+  }
 }
 
 function setAeratorState(isActive, triggerReason = 'Otomatisasi') {
   state.actuators.aerator = isActive;
-  document.getElementById('switchAerator').checked = isActive;
+  const switchEl = document.getElementById('switchAerator');
+  if (switchEl) switchEl.checked = isActive;
   updateActuatorVisuals();
 
   logEvent(
-    isActive ? 'Aerator / Kincir Menyala' : 'Aerator / Kincir Mati',
-    `DO: ${state.sensors.do} mg/L`,
+    isActive ? 'Kincir Aerator Menyala' : 'Kincir Aerator Mati',
+    `DO: ${state.sensors.do.toFixed(2)} mg/L`,
     triggerReason,
     isActive ? (state.sensors.do < state.thresholds.doMin ? 'Peringatan' : 'Manual') : 'Normal'
   );
 
-  logTerminal(`[RELAY] GPIO23 -> Aerator ${isActive ? 'HIGH (ON)' : 'LOW (OFF)'} [${triggerReason}]`, isActive ? 'text-amber-300' : 'text-slate-400');
+  logTerminal(`[RELAY] GPIO23 -> Aerator ${isActive ? 'HIGH (ON)' : 'LOW (OFF)'} [${triggerReason}]`, isActive ? 'text-amber-600 font-bold' : 'text-slate-500');
 }
 
 function updateActuatorVisuals() {
@@ -339,16 +369,18 @@ function updateActuatorVisuals() {
   const iconPump = document.getElementById('iconPump');
   const iconPumpBg = document.getElementById('iconPumpBg');
 
-  if (state.actuators.aerator) {
-    iconAeratorBg.classList.remove('bg-slate-800', 'text-slate-400');
-    iconAeratorBg.classList.add('bg-cyan-500/20', 'text-cyan-400');
-    iconAerator.classList.add('animate-spin-slow');
-    document.getElementById('subAeratorStatus').innerText = 'Status: Berputar (Aktif)';
-  } else {
-    iconAeratorBg.classList.remove('bg-cyan-500/20', 'text-cyan-400');
-    iconAeratorBg.classList.add('bg-slate-800', 'text-slate-400');
-    iconAerator.classList.remove('animate-spin-slow');
-    document.getElementById('subAeratorStatus').innerText = 'Otomatisasi: Aktif saat DO < 5.0';
+  if (iconAerator && iconAeratorBg) {
+    if (state.actuators.aerator) {
+      iconAeratorBg.className = 'w-8 h-8 rounded bg-teal-50 text-teal-600 flex items-center justify-center';
+      iconAerator.classList.add('animate-spin-slow');
+      const sub = document.getElementById('subAeratorStatus');
+      if (sub) sub.innerText = 'Status: Berputar (Aktif)';
+    } else {
+      iconAeratorBg.className = 'w-8 h-8 rounded bg-slate-100 text-slate-500 flex items-center justify-center';
+      iconAerator.classList.remove('animate-spin-slow');
+      const sub = document.getElementById('subAeratorStatus');
+      if (sub) sub.innerText = 'Otomatis saat DO < 5.0';
+    }
   }
 
   // Update Arus & Daya Listrik Kincir (1 HP Motor Tambak)
@@ -357,42 +389,47 @@ function updateActuatorVisuals() {
   if (aeratorCurrentEl) aeratorCurrentEl.innerText = state.actuators.aerator ? '3.4 A' : '0.0 A';
   if (aeratorPowerEl) aeratorPowerEl.innerText = state.actuators.aerator ? '750 W' : '0 W';
 
-  if (state.actuators.pump) {
-    iconPumpBg.classList.remove('bg-slate-800', 'text-slate-400');
-    iconPumpBg.classList.add('bg-emerald-500/20', 'text-emerald-400');
-    iconPump.classList.add('animate-spin');
-  } else {
-    iconPumpBg.classList.remove('bg-emerald-500/20', 'text-emerald-400');
-    iconPumpBg.classList.add('bg-slate-800', 'text-slate-400');
-    iconPump.classList.remove('animate-spin');
+  if (iconPump && iconPumpBg) {
+    if (state.actuators.pump) {
+      iconPumpBg.className = 'w-8 h-8 rounded bg-emerald-50 text-emerald-600 flex items-center justify-center';
+      iconPump.classList.add('animate-spin');
+    } else {
+      iconPumpBg.className = 'w-8 h-8 rounded bg-slate-100 text-slate-500 flex items-center justify-center';
+      iconPump.classList.remove('animate-spin');
+    }
   }
-}
 
-let siloRemainingKg = 15.6;
+  // Sinkronisasi status di canvas dan box panel
+  updateHardwarePanelVisuals();
+}
 
 function dispenseFeed() {
   const btn = document.getElementById('btnFeedNow');
-  btn.disabled = true;
-  btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Melontarkan Pakan (250g)...`;
-  initLucide();
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = `<i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i> Melontarkan Pakan...`;
+    initLucide();
+  }
 
-  logTerminal(`[FEEDER] PWM Servo GPIO18 menggerakkan ulir pakan (250 gram)...`, 'text-emerald-400');
+  logTerminal(`[FEEDER] PWM Servo GPIO18 menggerakkan ulir pakan (250 gram)...`, 'text-teal-700');
 
-  // Trigger lontaran pakan visual di canvas kolam jika ada
+  // Trigger lontaran pakan visual di canvas kolam
   if (typeof spawnPondFeed === 'function') {
     spawnPondFeed();
   }
 
   setTimeout(() => {
-    btn.disabled = false;
-    btn.innerHTML = `<i data-lucide="send" class="w-3.5 h-3.5 text-amber-400"></i> Lontarkan Pakan Sekarang (250g)`;
-    initLucide();
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = `<i data-lucide="send" class="w-3.5 h-3.5 text-amber-500"></i> Lontarkan Pakan Sekarang (250g)`;
+      initLucide();
+    }
 
     // Kurangi stok pakan silo
     siloRemainingKg = Math.max(0, parseFloat((siloRemainingKg - 0.25).toFixed(2)));
     const percent = Math.round((siloRemainingKg / 20.0) * 100);
     const siloLevelEls = document.querySelectorAll('.silo-fill-level');
-    siloLevelEls.forEach(el => el.style.height = `${percent}%`);
+    siloLevelEls.forEach(el => el.style.transform = `scaleY(${percent / 100})`);
     const siloCapText = document.getElementById('siloCapacityText');
     if (siloCapText) siloCapText.innerText = `${percent}% (${siloRemainingKg.toFixed(1)} kg)`;
 
@@ -411,23 +448,22 @@ function applyRolePermissions() {
   const switchFeeder = document.getElementById('switchFeeder');
   const btnFeedNow = document.getElementById('btnFeedNow');
 
-  switchAerator.disabled = isSiswa;
-  switchPump.disabled = isSiswa;
-  switchFeeder.disabled = isSiswa;
-  btnFeedNow.disabled = isSiswa;
+  if (switchAerator) switchAerator.disabled = isSiswa;
+  if (switchPump) switchPump.disabled = isSiswa;
+  if (switchFeeder) switchFeeder.disabled = isSiswa;
+  if (btnFeedNow) btnFeedNow.disabled = isSiswa;
 
-  if (isSiswa) {
-    roleBadge.innerText = 'Siswa (Read-Only)';
-    roleBadge.className = 'text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30';
-    btnFeedNow.classList.add('opacity-50', 'cursor-not-allowed');
-  } else if (state.role === 'admin') {
-    roleBadge.innerText = 'Admin (Full Access)';
-    roleBadge.className = 'text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30';
-    btnFeedNow.classList.remove('opacity-50', 'cursor-not-allowed');
-  } else {
-    roleBadge.innerText = 'Guru / Teknisi';
-    roleBadge.className = 'text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30';
-    btnFeedNow.classList.remove('opacity-50', 'cursor-not-allowed');
+  if (roleBadge) {
+    if (isSiswa) {
+      roleBadge.innerText = 'Siswa (Read-Only)';
+      roleBadge.className = 'text-[11px] font-mono px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200';
+    } else if (state.role === 'admin') {
+      roleBadge.innerText = 'Admin (Full Access)';
+      roleBadge.className = 'text-[11px] font-mono px-2 py-0.5 rounded bg-purple-50 text-purple-700 border border-purple-200';
+    } else {
+      roleBadge.innerText = 'Guru / Teknisi';
+      roleBadge.className = 'text-[11px] font-mono px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200';
+    }
   }
 }
 
@@ -438,29 +474,41 @@ function initSliders() {
   const sliderPH = document.getElementById('simSliderPH');
   const sliderSalinity = document.getElementById('simSliderSalinity');
 
-  sliderDO.addEventListener('input', (e) => {
-    state.sensors.do = parseFloat(e.target.value);
-    document.getElementById('sliderValDO').innerText = state.sensors.do.toFixed(1) + ' mg/L';
-    evaluateSystemRules();
-  });
+  if (sliderDO) {
+    sliderDO.addEventListener('input', (e) => {
+      state.sensors.do = parseFloat(e.target.value);
+      const valEl = document.getElementById('sliderValDO');
+      if (valEl) valEl.innerText = state.sensors.do.toFixed(2) + ' mg/L';
+      evaluateSystemRules();
+    });
+  }
 
-  sliderTemp.addEventListener('input', (e) => {
-    state.sensors.temp = parseFloat(e.target.value);
-    document.getElementById('sliderValTemp').innerText = state.sensors.temp.toFixed(1) + ' °C';
-    evaluateSystemRules();
-  });
+  if (sliderTemp) {
+    sliderTemp.addEventListener('input', (e) => {
+      state.sensors.temp = parseFloat(e.target.value);
+      const valEl = document.getElementById('sliderValTemp');
+      if (valEl) valEl.innerText = state.sensors.temp.toFixed(1) + ' °C';
+      evaluateSystemRules();
+    });
+  }
 
-  sliderPH.addEventListener('input', (e) => {
-    state.sensors.ph = parseFloat(e.target.value);
-    document.getElementById('sliderValPH').innerText = state.sensors.ph.toFixed(1);
-    evaluateSystemRules();
-  });
+  if (sliderPH) {
+    sliderPH.addEventListener('input', (e) => {
+      state.sensors.ph = parseFloat(e.target.value);
+      const valEl = document.getElementById('sliderValPH');
+      if (valEl) valEl.innerText = state.sensors.ph.toFixed(2);
+      evaluateSystemRules();
+    });
+  }
 
-  sliderSalinity.addEventListener('input', (e) => {
-    state.sensors.salinity = parseInt(e.target.value);
-    document.getElementById('sliderValSalinity').innerText = state.sensors.salinity + ' ppt';
-    evaluateSystemRules();
-  });
+  if (sliderSalinity) {
+    sliderSalinity.addEventListener('input', (e) => {
+      state.sensors.salinity = parseInt(e.target.value);
+      const valEl = document.getElementById('sliderValSalinity');
+      if (valEl) valEl.innerText = state.sensors.salinity + ' ppt';
+      evaluateSystemRules();
+    });
+  }
 }
 
 // Evaluasi aturan otomasi sesuai Dokumen Proposal Bab 5 & 6
@@ -468,140 +516,151 @@ function evaluateSystemRules() {
   updateDashboardCards();
 
   const doVal = state.sensors.do;
-  const tempVal = state.sensors.temp;
   const alertBanner = document.getElementById('dynamicAlertBanner');
   const alertTitle = document.getElementById('alertTitle');
   const alertDesc = document.getElementById('alertDescription');
 
   let hasCriticalIssue = false;
 
-  // Rule 1: DO < 5.0 mg/L -> Otomatisasi Aerator Hidup & Notifikasi WA
+  // Rule 1: DO < 5.00 mg/L -> Otomatisasi Aerator Hidup & Notifikasi WA
   if (doVal < state.thresholds.doMin) {
     hasCriticalIssue = true;
     if (!state.actuators.aerator) {
-      setAeratorState(true, 'Otomatis (DO Kritis < 5.0 mg/L)');
-      sendMockWhatsAppAlert(`DARURAT OKSIGEN! Kadar DO ${state.currentPond} turun menjadi ${doVal.toFixed(1)} mg/L (Batas aman: 5.0 mg/L). Aerator diaktifkan otomatis.`);
-      showToast(`Peringatan: Oksigen Rendah (${doVal.toFixed(1)} mg/L)! Aerator dihidupkan.`, 'danger');
+      setAeratorState(true, 'Otomatis (DO Kritis < 5.00 mg/L)');
+      sendMockWhatsAppAlert(`DARURAT OKSIGEN! Kadar DO ${state.currentPond} turun menjadi ${doVal.toFixed(2)} mg/L (Batas aman: 5.00 mg/L). Kincir aerator diaktifkan otomatis.`);
+      showToast(`Peringatan: Oksigen Rendah (${doVal.toFixed(2)} mg/L)! Kincir aerator dihidupkan.`, 'danger');
     }
-    alertBanner.className = 'rounded-xl border border-red-500/50 bg-red-950/40 p-4 transition-all duration-300 flex items-start gap-4';
-    alertTitle.innerText = `PERINGATAN KRITIS: OKSIGEN TERLARUT RENDAH (${doVal.toFixed(1)} mg/L)`;
-    alertDesc.innerText = `Kadar oksigen di bawah ambang aman 5.0 mg/L. Aerator kincir otomatis diaktifkan untuk mencegah stres/kematian ikan. Notifikasi terkirim via WhatsApp guru.`;
-    alertBanner.classList.remove('hidden');
+    if (alertBanner && alertTitle && alertDesc) {
+      alertBanner.className = 'rounded border border-red-300 bg-red-50 p-3.5 transition-colors flex items-start justify-between gap-3 font-mono text-xs text-red-900';
+      alertTitle.innerText = `Peringatan anoksia: Oksigen terlarut di bawah 5.00 mg/L (${doVal.toFixed(2)} mg/L)`;
+      alertDesc.innerText = `Kadar DO kolam merosot. Relai kincir aerator otomatis dinyalakan dan notifikasi darurat telah dipancarkan ke WhatsApp teknisi tambak.`;
+      alertBanner.classList.remove('hidden');
+    }
   } 
-  // Rule 2: DO >= 5.4 mg/L -> Hysteresis: Matikan aerator otomatis jika sebelumnya aktif karena otomasi
-  else if (doVal >= 5.4 && state.actuators.aerator) {
+  // Rule 2: DO >= 5.40 mg/L -> Hysteresis: Matikan aerator otomatis jika stabil
+  else if (doVal >= 5.40 && state.actuators.aerator) {
     setAeratorState(false, 'Otomatis (Kondisi DO Stabil & Hemat Energi)');
-    sendMockWhatsAppAlert(`INFO STABIL: Kadar oksigen ${state.currentPond} kembali aman (${doVal.toFixed(1)} mg/L). Aerator dimatikan otomatis.`);
-    showToast(`Oksigen kembali stabil (${doVal.toFixed(1)} mg/L). Aerator dimatikan.`, 'success');
-    alertBanner.classList.add('hidden');
-  } else if (!hasCriticalIssue) {
+    sendMockWhatsAppAlert(`INFO STABIL: Kadar oksigen ${state.currentPond} kembali aman (${doVal.toFixed(2)} mg/L). Kincir aerator dimatikan otomatis.`);
+    showToast(`Oksigen kembali stabil (${doVal.toFixed(2)} mg/L). Kincir aerator dimatikan.`, 'success');
+    if (alertBanner) alertBanner.classList.add('hidden');
+  } else if (!hasCriticalIssue && alertBanner) {
     alertBanner.classList.add('hidden');
   }
 
-  // Update visual kartu sensor
   updateCardBadges();
 }
 
 function updateDashboardCards() {
-  document.getElementById('val-temp').innerText = state.sensors.temp.toFixed(1);
-  document.getElementById('val-ph').innerText = state.sensors.ph.toFixed(2);
-  document.getElementById('val-salinity').innerText = state.sensors.salinity;
-  document.getElementById('val-do').innerText = state.sensors.do.toFixed(2);
-  document.getElementById('val-turbidity').innerText = state.sensors.turbidity;
+  const elTemp = document.getElementById('val-temp');
+  const elPH = document.getElementById('val-ph');
+  const elSal = document.getElementById('val-salinity');
+  const elDO = document.getElementById('val-do');
+  const elTurb = document.getElementById('val-turbidity');
+
+  if (elTemp) elTemp.innerText = state.sensors.temp.toFixed(1);
+  if (elPH) elPH.innerText = state.sensors.ph.toFixed(2);
+  if (elSal) elSal.innerText = state.sensors.salinity;
+  if (elDO) elDO.innerText = state.sensors.do.toFixed(2);
+  if (elTurb) elTurb.innerText = state.sensors.turbidity;
 
   // Sinkronisasi ke Layar OLED dan Panel Fisik WIRU
   updateHardwarePanelVisuals();
 }
 
 function updateCardBadges() {
-  // DO Badge
   const badgeDO = document.getElementById('badge-do');
-  if (state.sensors.do < 4.5) {
-    badgeDO.innerText = 'Bahaya';
-    badgeDO.className = 'status-badge bg-red-500/20 text-red-400 border border-red-500/30';
-  } else if (state.sensors.do < 5.0) {
-    badgeDO.innerText = 'Rendah';
-    badgeDO.className = 'status-badge bg-amber-500/20 text-amber-400 border border-amber-500/30';
-  } else {
-    badgeDO.innerText = 'Normal';
-    badgeDO.className = 'status-badge bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+  if (badgeDO) {
+    if (state.sensors.do < 4.50) {
+      badgeDO.innerText = 'Bahaya';
+      badgeDO.className = 'text-[10px] px-1.5 py-0.5 rounded bg-red-100 text-red-700 font-mono font-semibold';
+    } else if (state.sensors.do < 5.00) {
+      badgeDO.innerText = 'Rendah';
+      badgeDO.className = 'text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 font-mono font-semibold';
+    } else {
+      badgeDO.innerText = 'Optimal';
+      badgeDO.className = 'text-[10px] px-1.5 py-0.5 rounded bg-teal-100 text-teal-800 font-mono font-semibold';
+    }
   }
 
-  // Suhu Badge
   const badgeTemp = document.getElementById('badge-temp');
-  if (state.sensors.temp > 32.0 || state.sensors.temp < 24.0) {
-    badgeTemp.innerText = 'Abnormal';
-    badgeTemp.className = 'status-badge bg-amber-500/20 text-amber-400 border border-amber-500/30';
-  } else {
-    badgeTemp.innerText = 'Normal';
-    badgeTemp.className = 'status-badge bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+  if (badgeTemp) {
+    if (state.sensors.temp > 32.0 || state.sensors.temp < 24.0) {
+      badgeTemp.innerText = 'Abnormal';
+      badgeTemp.className = 'text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 font-mono font-semibold';
+    } else {
+      badgeTemp.innerText = 'Normal';
+      badgeTemp.className = 'text-[10px] px-1.5 py-0.5 rounded bg-teal-100 text-teal-800 font-mono font-semibold';
+    }
   }
 }
 
 // --- Skenario Interaktif Sesuai Dokumen Proposal ---
 function initScenarios() {
-  // Skenario 1: Drop Oksigen (Proposal Hal 3: Contoh Skenario)
-  document.getElementById('scenarioDropOxygen').addEventListener('click', () => {
-    state.sensors.do = 4.6;
-    document.getElementById('simSliderDO').value = 4.6;
-    document.getElementById('sliderValDO').innerText = '4.6 mg/L';
-    logTerminal('[SCENARIO] Simulasi: Oksigen terlarut kolam merosot ke 4.6 mg/L!', 'text-rose-400 font-bold');
-    evaluateSystemRules();
-    pushDataToChart(4.6, state.sensors.temp);
-  });
+  const scDrop = document.getElementById('scenarioDropOxygen');
+  if (scDrop) {
+    scDrop.addEventListener('click', () => {
+      state.sensors.do = 4.60;
+      const slider = document.getElementById('simSliderDO');
+      if (slider) slider.value = 4.60;
+      const valEl = document.getElementById('sliderValDO');
+      if (valEl) valEl.innerText = '4.60 mg/L';
+      logTerminal('[SCENARIO] Simulasi: Oksigen terlarut kolam merosot ke 4.60 mg/L!', 'text-red-600 font-bold');
+      evaluateSystemRules();
+      pushDataToChart(4.60, state.sensors.temp);
+    });
+  }
 
-  // Skenario 2: Jadwal Pakan Tiba
-  document.getElementById('scenarioFeedSchedule').addEventListener('click', () => {
-    logTerminal('[SCENARIO] Trigger timer pakan otomatis jadwal 11:30 WIB...', 'text-cyan-400 font-bold');
-    dispenseFeed();
-  });
+  const scFeed = document.getElementById('scenarioFeedSchedule');
+  if (scFeed) {
+    scFeed.addEventListener('click', () => {
+      logTerminal('[SCENARIO] Trigger timer pakan otomatis jadwal 11:30 WIB...', 'text-teal-700 font-bold');
+      dispenseFeed();
+    });
+  }
 
-  // Skenario 3: Koneksi Terputus (Offline mode & buffering)
-  document.getElementById('scenarioNetworkCut').addEventListener('click', () => {
-    toggleNetworkConnection();
-  });
+  const scNet = document.getElementById('scenarioNetworkCut');
+  if (scNet) {
+    scNet.addEventListener('click', () => {
+      toggleNetworkConnection();
+    });
+  }
 
-  // Skenario 4: Pulihkan Kondisi Normal
-  document.getElementById('scenarioRestoreNormal').addEventListener('click', () => {
-    state.sensors.do = 5.4;
-    state.sensors.temp = 28.5;
-    state.sensors.ph = 7.4;
-    state.sensors.salinity = 18;
+  const scNorm = document.getElementById('scenarioRestoreNormal');
+  if (scNorm) {
+    scNorm.addEventListener('click', () => {
+      state.sensors.do = 5.40;
+      state.sensors.temp = 28.5;
+      state.sensors.ph = 7.40;
+      state.sensors.salinity = 18;
 
-    document.getElementById('simSliderDO').value = 5.4;
-    document.getElementById('sliderValDO').innerText = '5.4 mg/L';
-    document.getElementById('simSliderTemp').value = 28.5;
-    document.getElementById('sliderValTemp').innerText = '28.5 °C';
-    document.getElementById('simSliderPH').value = 7.4;
-    document.getElementById('sliderValPH').innerText = '7.4';
-    document.getElementById('simSliderSalinity').value = 18;
-    document.getElementById('sliderValSalinity').innerText = '18 ppt';
+      const sDO = document.getElementById('simSliderDO');
+      if (sDO) sDO.value = 5.40;
+      const sTemp = document.getElementById('simSliderTemp');
+      if (sTemp) sTemp.value = 28.5;
+      const sPH = document.getElementById('simSliderPH');
+      if (sPH) sPH.value = 7.40;
+      const sSal = document.getElementById('simSliderSalinity');
+      if (sSal) sSal.value = 18;
 
-    if (!state.isOnline) {
-      toggleNetworkConnection(true);
-    }
+      if (!state.isOnline) {
+        toggleNetworkConnection(true);
+      }
 
-    logTerminal('[SCENARIO] Parameter dipulihkan ke ambang normal dan sehat.', 'text-emerald-400 font-bold');
-    evaluateSystemRules();
-    pushDataToChart(5.4, 28.5);
-    showToast('Kondisi kolam dinormalkan.', 'success');
-  });
+      logTerminal('[SCENARIO] Parameter dipulihkan ke ambang normal dan sehat.', 'text-emerald-700 font-bold');
+      evaluateSystemRules();
+      pushDataToChart(5.40, 28.5);
+      showToast('Kondisi kolam dinormalkan.', 'success');
+    });
+  }
 
-  // Auto-Random Stream Toggle
   const btnToggleStream = document.getElementById('btnToggleRandomStream');
-  btnToggleStream.addEventListener('click', () => {
-    state.autoStream = !state.autoStream;
-    if (state.autoStream) {
-      btnToggleStream.className = 'px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white transition flex items-center gap-1.5';
-      btnToggleStream.innerHTML = `<i data-lucide="play" class="w-3.5 h-3.5"></i> Berjalan`;
-      showToast('Data stream otomatis diaktifkan', 'info');
-    } else {
-      btnToggleStream.className = 'px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-xs font-semibold text-slate-300 transition flex items-center gap-1.5';
-      btnToggleStream.innerHTML = `<i data-lucide="pause" class="w-3.5 h-3.5"></i> Dijeda`;
-      showToast('Data stream otomatis dijeda', 'info');
-    }
-    initLucide();
-  });
+  if (btnToggleStream) {
+    btnToggleStream.addEventListener('click', () => {
+      state.autoStream = !state.autoStream;
+      btnToggleStream.innerText = state.autoStream ? 'Berjalan' : 'Dijeda';
+      showToast(state.autoStream ? 'Data stream otomatis diaktifkan' : 'Data stream dijeda', 'info');
+    });
+  }
 }
 
 function toggleNetworkConnection(forceOnline = false) {
@@ -610,31 +669,32 @@ function toggleNetworkConnection(forceOnline = false) {
   const text = document.getElementById('connectionStatusText');
 
   if (state.isOnline) {
-    badge.className = 'flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-950/40 border border-emerald-500/30 text-emerald-400 text-xs font-medium';
-    badge.innerHTML = `
-      <span class="relative flex h-2.5 w-2.5">
-        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-      </span>
-      <span>ESP32: Online (Wi-Fi)</span>
-    `;
-    logTerminal(`[WIFI] Terkoneksi kembali ke AP! Mengirim ${state.offlineBuffer} data cache yang tertunda...`, 'text-emerald-400');
+    if (badge) {
+      badge.className = 'flex items-center gap-2 px-2.5 py-1.5 rounded bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-mono';
+      badge.innerHTML = `
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span id="connectionStatusText">ESP32: Online</span>
+      `;
+    }
+    logTerminal(`[WIFI] Terkoneksi kembali ke AP! Mengirim ${state.offlineBuffer} data cache yang tertunda...`, 'text-teal-700');
     if (state.offlineBuffer > 0) {
-      showToast(`Koneksi pulih. ${state.offlineBuffer} data cache berhasil disinkronisasi ke server MySQL!`, 'success');
+      showToast(`Koneksi pulih. ${state.offlineBuffer} data cache berhasil disinkronisasi ke server!`, 'success');
       state.packetCount += state.offlineBuffer;
       state.offlineBuffer = 0;
-      document.getElementById('offlineBufferCount').innerText = '0';
-      document.getElementById('packetCount').innerText = state.packetCount;
+      const bufEl = document.getElementById('offlineBufferCount');
+      if (bufEl) bufEl.innerText = '0';
+      const pktEl = document.getElementById('packetCount');
+      if (pktEl) pktEl.innerText = state.packetCount;
     }
   } else {
-    badge.className = 'flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-950/40 border border-amber-500/30 text-amber-400 text-xs font-medium';
-    badge.innerHTML = `
-      <span class="relative flex h-2.5 w-2.5">
-        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
-      </span>
-      <span>ESP32: Offline (Caching Lokal)</span>
-    `;
-    logTerminal(`[WIFI] Internet Terputus! ESP32 mengalihkan penyimpanan ke Flash SPIFFS...`, 'text-amber-400');
+    if (badge) {
+      badge.className = 'flex items-center gap-2 px-2.5 py-1.5 rounded bg-amber-50 border border-amber-200 text-amber-700 text-xs font-mono';
+      badge.innerHTML = `
+        <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+        <span id="connectionStatusText">ESP32: Offline (Caching)</span>
+      `;
+    }
+    logTerminal(`[WIFI] Internet Terputus! ESP32 mengalihkan penyimpanan ke Flash SPIFFS...`, 'text-amber-700');
     showToast('Internet terputus! Data disimpan sementara di memori internal ESP32.', 'warning');
   }
 }
@@ -645,12 +705,10 @@ function startAutoStream() {
     if (!state.autoStream) return;
 
     if (state.isOnline) {
-      // Fluktuasi natural kecil
-      const dDO = (Math.random() - 0.48) * 0.05;
-      const dTemp = (Math.random() - 0.5) * 0.05;
+      const dDO = (Math.random() - 0.48) * 0.04;
+      const dTemp = (Math.random() - 0.5) * 0.04;
 
-      // Jaga dalam range jika tidak sedang dipaksa skenario
-      if (state.sensors.do > 4.7 && state.sensors.do < 6.5) {
+      if (state.sensors.do > 4.70 && state.sensors.do < 6.50) {
         state.sensors.do = parseFloat(Math.max(3.0, Math.min(8.0, state.sensors.do + dDO)).toFixed(2));
       }
       state.sensors.temp = parseFloat(Math.max(25.0, Math.min(34.0, state.sensors.temp + dTemp)).toFixed(1));
@@ -659,34 +717,44 @@ function startAutoStream() {
       pushDataToChart(state.sensors.do, state.sensors.temp);
 
       state.packetCount++;
-      document.getElementById('packetCount').innerText = state.packetCount;
+      const pktEl = document.getElementById('packetCount');
+      if (pktEl) pktEl.innerText = state.packetCount;
 
-      logTerminal(`[MQTT PUSH] topic: "wiru/kolamA/telemetry" payload: {"do":${state.sensors.do},"temp":${state.sensors.temp},"ph":${state.sensors.ph}}`, 'text-slate-500');
+      logTerminal(`[MQTT PUSH] topic: "wiru/kolamA/telemetry" payload: {"do":${state.sensors.do.toFixed(2)},"temp":${state.sensors.temp.toFixed(1)},"ph":${state.sensors.ph.toFixed(2)}}`, 'text-slate-400');
     } else {
-      // Mode offline: bertambah di buffer
       state.offlineBuffer++;
-      document.getElementById('offlineBufferCount').innerText = state.offlineBuffer;
-      logTerminal(`[SPIFFS CACHE] Menyimpan record #${state.offlineBuffer} di memori lokal ESP32...`, 'text-amber-400/80');
+      const bufEl = document.getElementById('offlineBufferCount');
+      if (bufEl) bufEl.innerText = state.offlineBuffer;
+      logTerminal(`[SPIFFS CACHE] Menyimpan record #${state.offlineBuffer} di memori lokal ESP32...`, 'text-amber-700');
     }
   }, 5000);
 }
 
 // --- Terminal Logger ---
 function initTerminal() {
-  document.getElementById('btnClearTerminal').addEventListener('click', () => {
-    document.getElementById('espTerminalOutput').innerHTML = '<div class="text-slate-500">[TERMINAL CLEARED]</div>';
-  });
+  const btnClear = document.getElementById('btnClearTerminal');
+  if (btnClear) {
+    btnClear.addEventListener('click', () => {
+      const term = document.getElementById('espTerminalOutput');
+      if (term) term.innerHTML = '<div class="text-slate-400">[TERMINAL CLEARED]</div>';
+    });
+  }
 
-  document.getElementById('btnManualPush').addEventListener('click', () => {
-    state.packetCount++;
-    document.getElementById('packetCount').innerText = state.packetCount;
-    logTerminal(`[MQTT MANUAL] Paket telemetri dikirim langsung oleh pengguna.`, 'text-cyan-400');
-    showToast('Paket telemetri berhasil di-push ke server.', 'info');
-  });
+  const btnManual = document.getElementById('btnManualPush');
+  if (btnManual) {
+    btnManual.addEventListener('click', () => {
+      state.packetCount++;
+      const pktEl = document.getElementById('packetCount');
+      if (pktEl) pktEl.innerText = state.packetCount;
+      logTerminal(`[MQTT MANUAL] Paket telemetri dikirim langsung oleh pengguna.`, 'text-teal-700');
+      showToast('Paket telemetri berhasil di-push ke server.', 'info');
+    });
+  }
 }
 
-function logTerminal(message, colorClass = 'text-slate-400') {
+function logTerminal(message, colorClass = 'text-slate-500') {
   const terminal = document.getElementById('espTerminalOutput');
+  if (!terminal) return;
   const now = new Date();
   const timeStr = now.toLocaleTimeString('id-ID');
   const line = document.createElement('div');
@@ -710,36 +778,40 @@ function logEvent(event, param, action, status = 'Normal') {
 
 function renderLogs() {
   const tbody = document.getElementById('logsTableBody');
+  if (!tbody) return;
   tbody.innerHTML = '';
 
   state.logs.forEach(log => {
     const tr = document.createElement('tr');
-    tr.className = 'hover:bg-slate-800/40 transition';
+    tr.className = 'hover:bg-slate-50 transition border-b border-slate-100';
 
-    let statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] bg-slate-700 text-slate-300">Normal</span>';
+    let statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] bg-slate-100 text-slate-700">Normal</span>';
     if (log.status === 'Peringatan') {
-      statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] bg-red-500/20 text-red-300 border border-red-500/30">Peringatan</span>';
+      statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] bg-red-100 text-red-700 border border-red-200">Peringatan</span>';
     } else if (log.status === 'Manual') {
-      statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30">Manual</span>';
+      statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] bg-amber-100 text-amber-800 border border-amber-200">Manual</span>';
     }
 
     tr.innerHTML = `
-      <td class="p-3 text-slate-400">${log.time}</td>
-      <td class="p-3 font-semibold text-white">${log.event}</td>
-      <td class="p-3 text-cyan-300">${log.param}</td>
-      <td class="p-3 text-slate-300">${log.action}</td>
-      <td class="p-3">${statusBadge}</td>
+      <td class="p-2.5 text-slate-500 font-mono">${log.time}</td>
+      <td class="p-2.5 font-semibold text-slate-800">${log.event}</td>
+      <td class="p-2.5 text-teal-700 font-mono font-medium">${log.param}</td>
+      <td class="p-2.5 text-slate-600">${log.action}</td>
+      <td class="p-2.5">${statusBadge}</td>
     `;
     tbody.appendChild(tr);
   });
 
-  // Export CSV Handler
-  document.getElementById('btnExportCSV').onclick = exportLogsToCSV;
-  document.getElementById('btnClearLogs').onclick = () => {
-    state.logs = [];
-    renderLogs();
-    showToast('Log riwayat dikosongkan.', 'info');
-  };
+  const exportBtn = document.getElementById('btnExportCSV');
+  if (exportBtn) exportBtn.onclick = exportLogsToCSV;
+  const clearBtn = document.getElementById('btnClearLogs');
+  if (clearBtn) {
+    clearBtn.onclick = () => {
+      state.logs = [];
+      renderLogs();
+      showToast('Log riwayat dikosongkan.', 'info');
+    };
+  }
 }
 
 function exportLogsToCSV() {
@@ -752,7 +824,7 @@ function exportLogsToCSV() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `laporan_kualitas_air_smk_puger_${new Date().toISOString().slice(0,10)}.csv`;
+  a.download = `wiru_laporan_tambak_puger_${new Date().toISOString().slice(0,10)}.csv`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -762,37 +834,38 @@ function exportLogsToCSV() {
 // --- WhatsApp Mockup Preview ---
 function sendMockWhatsAppAlert(message) {
   const preview = document.getElementById('previewNotifText');
-  preview.innerText = message;
+  if (preview) preview.innerText = message;
 
   const chatBubble = document.getElementById('dynamicChatBubble');
   const chatText = document.getElementById('chatAlertText');
   const chatTime = document.getElementById('chatAlertTime');
 
-  chatText.innerHTML = message.replace(/\n/g, '<br>');
-  chatTime.innerText = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
-  chatBubble.classList.remove('hidden');
+  if (chatText) chatText.innerHTML = message.replace(/\n/g, '<br>');
+  if (chatTime) chatTime.innerText = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
+  if (chatBubble) chatBubble.classList.remove('hidden');
 }
 
 // --- Toast Notification System ---
 function showToast(message, type = 'info') {
   const container = document.getElementById('toastContainer');
+  if (!container) return;
   const toast = document.createElement('div');
 
-  let borderBg = 'bg-slate-800 border-slate-700 text-slate-200';
+  let borderBg = 'bg-white border-slate-200 text-slate-800 shadow-lg';
   let iconName = 'info';
 
   if (type === 'success') {
-    borderBg = 'bg-slate-900 border-emerald-500/50 text-emerald-300';
+    borderBg = 'bg-white border-teal-500 text-teal-900 shadow-teal-100 shadow-lg';
     iconName = 'check-circle';
   } else if (type === 'danger') {
-    borderBg = 'bg-slate-900 border-red-500/50 text-red-300';
+    borderBg = 'bg-white border-red-500 text-red-900 shadow-red-100 shadow-lg';
     iconName = 'alert-triangle';
   } else if (type === 'warning') {
-    borderBg = 'bg-slate-900 border-amber-500/50 text-amber-300';
+    borderBg = 'bg-white border-amber-500 text-amber-900 shadow-amber-100 shadow-lg';
     iconName = 'alert-circle';
   }
 
-  toast.className = `flex items-center gap-2.5 px-4 py-3 rounded-xl border shadow-2xl text-xs font-medium pointer-events-auto transition-all duration-300 transform translate-y-2 opacity-0 ${borderBg}`;
+  toast.className = `flex items-center gap-2.5 px-4 py-3 rounded-lg border text-xs font-medium pointer-events-auto transition-all duration-300 transform translate-y-2 opacity-0 ${borderBg}`;
   toast.innerHTML = `<i data-lucide="${iconName}" class="w-4 h-4 shrink-0"></i><span>${message}</span>`;
 
   container.appendChild(toast);
@@ -808,21 +881,15 @@ function showToast(message, type = 'info') {
   }, 4000);
 }
 
-
 // =========================================================================
-// MODUL TAMPILAN FISIK IOT & DIGITAL TWIN KOLAM TAMBAK
+// MODUL TAMPILAN FISIK IOT & DIGITAL TWIN KOLAM TAMBAK (WIRU LIGHT MODE)
 // =========================================================================
 
 let pondCanvas = null;
 let pondCtx = null;
-let pondAnimationId = null;
 let showComponentLabels = true;
 let aeratorAngle = 0;
-let lastFrameTime = performance.now();
-let frameCount = 0;
-let lastFpsUpdateTime = performance.now();
 
-// Entitas Simulasi Kolam
 const pondState = {
   bubbles: [],
   splashes: [],
@@ -835,7 +902,6 @@ function initHardwareView() {
   if (!pondCanvas) return;
   pondCtx = pondCanvas.getContext('2d');
 
-  // Inisialisasi 8 ekor ikan / udang
   pondState.fishes = [];
   for (let i = 0; i < 8; i++) {
     pondState.fishes.push({
@@ -845,16 +911,15 @@ function initHardwareView() {
       vy: (Math.random() - 0.5) * 0.3,
       size: 16 + Math.random() * 8,
       tailPhase: Math.random() * Math.PI * 2,
-      color: i % 2 === 0 ? '#38bdf8' : '#fb923c' // Cyan & Orange
+      color: i % 2 === 0 ? '#0aa094' : '#0a3651' // WIRU Teal & Marine Navy
     });
   }
 
-  // Tombol Interaksi Cepat di Tampilan Kolam
   const btnQuickAerator = document.getElementById('btnQuickPondAerator');
   if (btnQuickAerator) {
     btnQuickAerator.addEventListener('click', () => {
       setAeratorState(!state.actuators.aerator, 'Tombol Visual Kolam');
-      btnQuickAerator.innerText = state.actuators.aerator ? 'Matikan Kincir Aerator' : 'Nyalakan Kincir Aerator';
+      btnQuickAerator.innerText = state.actuators.aerator ? 'Matikan Kincir Air' : 'Nyalakan Kincir Air';
     });
   }
 
@@ -866,18 +931,13 @@ function initHardwareView() {
     });
   }
 
-  // Tombol Saklar Fisik di Box Panel
   const hwPanelBtnAerator = document.getElementById('hwPanelBtnAerator');
   if (hwPanelBtnAerator) {
     hwPanelBtnAerator.addEventListener('click', () => {
       setAeratorState(!state.actuators.aerator, 'Saklar Fisik Panel IP66');
-      if (btnQuickAerator) {
-        btnQuickAerator.innerText = state.actuators.aerator ? 'Matikan Kincir Aerator' : 'Nyalakan Kincir Aerator';
-      }
     });
   }
 
-  // Toggle Label Komponen
   const btnToggleLabels = document.getElementById('btnToggleLabels');
   if (btnToggleLabels) {
     btnToggleLabels.addEventListener('click', () => {
@@ -886,12 +946,10 @@ function initHardwareView() {
     });
   }
 
-  // Jalankan Render Loop Kolam
   updateHardwarePanelVisuals();
   requestAnimationFrame(renderPondScene);
 }
 
-// Lontarkan butiran pakan di canvas kolam
 function spawnPondFeed() {
   const feederX = 860;
   const feederY = 130;
@@ -899,16 +957,13 @@ function spawnPondFeed() {
     pondState.feedPellets.push({
       x: feederX + (Math.random() - 0.5) * 20,
       y: feederY + Math.random() * 10,
-      vx: (Math.random() - 0.5) * 1.5 - 1.2, // melontar ke kiri arah kolam
-      vy: Math.random() * 2 + 1,
-      inWater: false
+      vx: (Math.random() - 0.5) * 1.5 - 1.2,
+      vy: Math.random() * 2 + 1
     });
   }
 }
 
-// Sinkronisasi Data ke Box Panel Fisik (OLED Display & Lampu LED)
 function updateHardwarePanelVisuals() {
-  // Update Layar OLED Mini
   const oledDO = document.getElementById('oledDO');
   const oledTemp = document.getElementById('oledTemp');
   const oledPH = document.getElementById('oledPH');
@@ -916,108 +971,84 @@ function updateHardwarePanelVisuals() {
   const oledWifi = document.getElementById('oledWifiStatus');
   const oledDOStatus = document.getElementById('oledDOStatus');
 
-  if (oledDO) oledDO.innerText = state.sensors.do.toFixed(1);
+  if (oledDO) oledDO.innerText = state.sensors.do.toFixed(2);
   if (oledTemp) oledTemp.innerText = state.sensors.temp.toFixed(1);
-  if (oledPH) oledPH.innerText = state.sensors.ph.toFixed(1);
+  if (oledPH) oledPH.innerText = state.sensors.ph.toFixed(2);
   if (oledAerator) oledAerator.innerText = state.actuators.aerator ? 'ON' : 'OFF';
   if (oledWifi) oledWifi.innerText = state.isOnline ? 'WIFI:OK' : 'WIFI:ERR';
 
   if (oledDOStatus) {
-    if (state.sensors.do < 4.5) {
+    if (state.sensors.do < 4.50) {
       oledDOStatus.innerText = '[DANGER]';
       oledDOStatus.className = 'text-red-400 font-bold';
-    } else if (state.sensors.do < 5.0) {
+    } else if (state.sensors.do < 5.00) {
       oledDOStatus.innerText = '[WARN]';
       oledDOStatus.className = 'text-amber-400 font-bold';
     } else {
       oledDOStatus.innerText = '[NORM]';
-      oledDOStatus.className = 'text-cyan-200';
+      oledDOStatus.className = 'text-teal-300';
     }
   }
 
-  // Update LED Fisik Panel
   const hwLedAerator = document.getElementById('hwLedAerator');
-  const hwLedAeratorText = document.getElementById('hwLedAeratorText');
   const hwLedAlarm = document.getElementById('hwLedAlarm');
-  const hwLedAlarmText = document.getElementById('hwLedAlarmText');
   const hwLedNet = document.getElementById('hwLedNet');
-  const hwLedNetText = document.getElementById('hwLedNetText');
 
   if (hwLedAerator) {
-    if (state.actuators.aerator) {
-      hwLedAerator.className = 'w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse';
-      if (hwLedAeratorText) hwLedAeratorText.innerText = 'ACTIVE';
-    } else {
-      hwLedAerator.className = 'w-2.5 h-2.5 rounded-full bg-stone-700';
-      if (hwLedAeratorText) hwLedAeratorText.innerText = 'IDLE';
-    }
+    hwLedAerator.className = state.actuators.aerator 
+      ? 'w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse' 
+      : 'w-2.5 h-2.5 rounded-full bg-slate-300';
   }
 
   if (hwLedAlarm) {
-    const isCritical = state.sensors.do < 5.0 || state.sensors.temp > 33.0;
-    if (isCritical) {
-      hwLedAlarm.className = 'w-2.5 h-2.5 rounded-full bg-red-500 animate-ping';
-      if (hwLedAlarmText) hwLedAlarmText.innerText = 'ALERT';
-    } else {
-      hwLedAlarm.className = 'w-2.5 h-2.5 rounded-full bg-stone-700';
-      if (hwLedAlarmText) hwLedAlarmText.innerText = 'OFF';
-    }
+    const isCritical = state.sensors.do < 5.00 || state.sensors.temp > 33.0;
+    hwLedAlarm.className = isCritical 
+      ? 'w-2.5 h-2.5 rounded-full bg-red-500 animate-ping' 
+      : 'w-2.5 h-2.5 rounded-full bg-slate-300';
   }
 
   if (hwLedNet) {
-    if (state.isOnline) {
-      hwLedNet.className = 'w-2.5 h-2.5 rounded-full bg-cyan-400';
-      if (hwLedNetText) hwLedNetText.innerText = 'LINK';
-    } else {
-      hwLedNet.className = 'w-2.5 h-2.5 rounded-full bg-stone-700';
-      if (hwLedNetText) hwLedNetText.innerText = 'LOST';
-    }
+    hwLedNet.className = state.isOnline 
+      ? 'w-2.5 h-2.5 rounded-full bg-teal-500' 
+      : 'w-2.5 h-2.5 rounded-full bg-slate-300';
   }
 
-  // Update Status Banner di Canvas
   const pondWaterBadge = document.getElementById('pondWaterStatusBadge');
   const pondAeratorBadge = document.getElementById('pondAeratorStatusBadge');
 
   if (pondWaterBadge) {
-    if (state.sensors.do < 5.0) {
-      pondWaterBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span><span class="text-red-300">Air: Oksigen Kritis (&lt; 5.0)</span>';
+    if (state.sensors.do < 5.00) {
+      pondWaterBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span><span class="text-red-700">Air: Oksigen Kritis (&lt; 5.00)</span>';
+      pondWaterBadge.className = 'px-2 py-0.5 rounded bg-red-50 border border-red-200 text-red-700 flex items-center gap-1.5 shadow-sm';
     } else {
-      pondWaterBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-500"></span><span class="text-emerald-300">Air: Normal &amp; Terjaga</span>';
+      pondWaterBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-teal-500"></span><span class="text-teal-800">Air: Kondisi Optimal</span>';
+      pondWaterBadge.className = 'px-2 py-0.5 rounded bg-teal-50 border border-teal-200 text-teal-800 flex items-center gap-1.5 shadow-sm';
     }
   }
 
   if (pondAeratorBadge) {
-    pondAeratorBadge.innerText = state.actuators.aerator ? 'Aerator: Berputar (Aerasi Aktif)' : 'Aerator: Diam';
+    pondAeratorBadge.innerText = state.actuators.aerator ? 'Kincir: Berputar (Aerasi Aktif)' : 'Kincir: Diam';
   }
 }
 
-// --- Render Loop Utama Scene Kolam Tambak (Canvas 2D) ---
+// --- Render Loop Canvas Kolam Tambak (Light WIRU Mode) ---
 function renderPondScene(now) {
   if (!pondCtx || !pondCanvas) return;
-
-  // Hitung FPS
-  frameCount++;
-  if (now - lastFpsUpdateTime >= 1000) {
-    const fpsEl = document.getElementById('pondFps');
-    if (fpsEl) fpsEl.innerText = frameCount;
-    frameCount = 0;
-    lastFpsUpdateTime = now;
-  }
 
   const w = pondCanvas.width;
   const h = pondCanvas.height;
   const waterLine = 175;
 
-  // 1. Gambar Langit Pesisir Pantai Puger
+  // 1. Langit Siang Cerah Pesisir Puger (Light Mode)
   const skyGrad = pondCtx.createLinearGradient(0, 0, 0, waterLine);
-  skyGrad.addColorStop(0, '#0c1626');
-  skyGrad.addColorStop(0.6, '#182d46');
-  skyGrad.addColorStop(1, '#2c4d6f');
+  skyGrad.addColorStop(0, '#cffafe'); // Soft Light Cyan Sky
+  skyGrad.addColorStop(0.7, '#e0f2fe');
+  skyGrad.addColorStop(1, '#f0fdfa');
   pondCtx.fillStyle = skyGrad;
   pondCtx.fillRect(0, 0, w, waterLine);
 
-  // Siluet Bukit Kapur Puger di Kejauhan
-  pondCtx.fillStyle = '#132135';
+  // Siluet Bukit Kapur Pesisir Puger
+  pondCtx.fillStyle = '#94a3b8';
   pondCtx.beginPath();
   pondCtx.moveTo(0, waterLine);
   pondCtx.lineTo(60, 130);
@@ -1029,25 +1060,23 @@ function renderPondScene(now) {
   pondCtx.closePath();
   pondCtx.fill();
 
-  // 2. Air Tambak (Bawah Garis Air)
-  const isHypoxia = state.sensors.do < 5.0;
+  // 2. Air Tambak Payau (Tosca Tropis Khas WIRU)
+  const isHypoxia = state.sensors.do < 5.00;
   const waterGrad = pondCtx.createLinearGradient(0, waterLine, 0, h);
   if (isHypoxia) {
-    // Air tampak lebih keruh/gelap saat oksigen kritis
-    waterGrad.addColorStop(0, '#0f2937');
-    waterGrad.addColorStop(0.5, '#0b1d28');
-    waterGrad.addColorStop(1, '#07121b');
+    waterGrad.addColorStop(0, '#134e4a'); // Keruh gelap saat oksigen drop
+    waterGrad.addColorStop(0.5, '#0f3a37');
+    waterGrad.addColorStop(1, '#092523');
   } else {
-    // Air payau segar sehat
-    waterGrad.addColorStop(0, '#0e3a4e');
-    waterGrad.addColorStop(0.4, '#0c3042');
-    waterGrad.addColorStop(1, '#071d28');
+    waterGrad.addColorStop(0, '#0d9488'); // Tosca jernih sehat
+    waterGrad.addColorStop(0.4, '#115e59');
+    waterGrad.addColorStop(1, '#134e4a');
   }
   pondCtx.fillStyle = waterGrad;
   pondCtx.fillRect(0, waterLine, w, h - waterLine);
 
   // Gelombang Permukaan Air
-  pondCtx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
+  pondCtx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
   pondCtx.lineWidth = 2;
   pondCtx.beginPath();
   const waveTime = now * 0.003;
@@ -1058,25 +1087,25 @@ function renderPondScene(now) {
   }
   pondCtx.stroke();
 
-  // 3. Dermaga Bambu & Box Kontroler WIRU di Sisi Kiri
+  // 3. Dermaga Kayu & Box Kontroler WIRU
   drawPierAndController(pondCtx, waterLine);
 
-  // 4. Unit Pakan Otomatis (Auto Feeder) di Sisi Kanan
+  // 4. Unit Auto Feeder
   drawAutoFeederUnit(pondCtx, waterLine);
 
-  // 5. Kincir Air (Paddlewheel Aerator) di Tengah Kolam
+  // 5. Kincir Aerator
   drawPaddlewheelAerator(pondCtx, waterLine, now);
 
-  // 6. Update & Render Butiran Pakan
+  // 6. Butiran Pakan
   updateAndDrawFeed(pondCtx, waterLine, h);
 
-  // 7. Update & Render Gelembung Udara & Percikan Kincir
+  // 7. Aerasi & Buih
   updateAndDrawAeration(pondCtx, waterLine);
 
-  // 8. Update & Render Ikan / Udang
+  // 8. Ikan / Udang
   updateAndDrawFishes(pondCtx, waterLine, h, w);
 
-  // 9. Label Komponen Penjelas (Bila Diaktifkan)
+  // 9. Label Komponen
   if (showComponentLabels) {
     drawComponentLabels(pondCtx);
   }
@@ -1084,72 +1113,66 @@ function renderPondScene(now) {
   requestAnimationFrame(renderPondScene);
 }
 
-// Gambar Dermaga dan Box Panel Kontroler di Kiri
 function drawPierAndController(ctx, waterLine) {
-  // Tiang pancang kayu/bambu dermaga
-  ctx.fillStyle = '#44403c';
+  // Tiang kayu dermaga
+  ctx.fillStyle = '#78350f';
   ctx.fillRect(80, 70, 16, 260);
   ctx.fillRect(150, 100, 14, 230);
   
   // Geladak papan inspeksi
-  ctx.fillStyle = '#292524';
+  ctx.fillStyle = '#92400e';
   ctx.fillRect(40, 110, 150, 12);
 
-  // Box Panel WIRU Outdoor (Abu-abu Industri)
-  ctx.fillStyle = '#334155';
-  ctx.strokeStyle = '#64748b';
+  // Box Panel WIRU Outdoor (Light Grey IP66)
+  ctx.fillStyle = '#e2e8f0';
+  ctx.strokeStyle = '#0aa094'; // WIRU Teal border
   ctx.lineWidth = 2;
   ctx.fillRect(72, 50, 32, 48);
   ctx.strokeRect(72, 50, 32, 48);
 
-  // Layar kecil di box
-  ctx.fillStyle = '#0f172a';
+  // Layar display di box
+  ctx.fillStyle = '#0a3651';
   ctx.fillRect(78, 58, 20, 14);
 
-  // LED hijau power di box panel fisik
+  // LED indikator
   ctx.fillStyle = '#10b981';
   ctx.beginPath();
   ctx.arc(88, 80, 2.5, 0, Math.PI * 2);
   ctx.fill();
 
-  // Kabel Sensor Hitam menjulur ke air
-  ctx.strokeStyle = '#020617';
+  // Kabel Sensor Hitam
+  ctx.strokeStyle = '#1e293b';
   ctx.lineWidth = 2.5;
   ctx.beginPath();
   ctx.moveTo(88, 98);
   ctx.bezierCurveTo(88, 140, 120, 150, 120, 240);
   ctx.stroke();
 
-  // Probe-probe Sensor Tercelup di Air
-  // 1. Probe Suhu Logam Stainless (DS18B20)
-  ctx.fillStyle = '#94a3b8';
+  // Probe Sensor Tercelup
+  ctx.fillStyle = '#94a3b8'; // Stainless Suhu
   ctx.fillRect(116, 235, 8, 22);
 
-  // 2. Probe DO (Putih dengan membran)
-  ctx.fillStyle = '#f8fafc';
+  ctx.fillStyle = '#f8fafc'; // DO Probe Putih
   ctx.fillRect(128, 220, 7, 26);
-  ctx.fillStyle = '#38bdf8';
-  ctx.fillRect(128, 244, 7, 3); // Membran DO
+  ctx.fillStyle = '#0aa094'; // Membran DO
+  ctx.fillRect(128, 244, 7, 3);
 
-  // 3. Probe pH (Kaca bulat)
-  ctx.fillStyle = '#1e293b';
+  ctx.fillStyle = '#0a3651'; // pH Body
   ctx.fillRect(106, 215, 6, 22);
-  ctx.fillStyle = '#38bdf8';
+  ctx.fillStyle = '#38bdf8'; // Bulb kaca
   ctx.beginPath();
   ctx.arc(109, 239, 4, 0, Math.PI * 2);
   ctx.fill();
 }
 
-// Gambar Unit Auto Feeder di Kanan
 function drawAutoFeederUnit(ctx, waterLine) {
   const x = 860;
   
-  // Tiang penyangga feeder
-  ctx.fillStyle = '#44403c';
+  ctx.fillStyle = '#78350f';
   ctx.fillRect(x - 6, 80, 12, 250);
 
-  // Corong Kerucut Penampung Pakan
-  ctx.fillStyle = '#0284c7';
+  // Corong Pakan WIRU Teal
+  ctx.fillStyle = '#0aa094';
   ctx.beginPath();
   ctx.moveTo(x - 28, 55);
   ctx.lineTo(x + 28, 55);
@@ -1157,25 +1180,20 @@ function drawAutoFeederUnit(ctx, waterLine) {
   ctx.lineTo(x - 8, 115);
   ctx.closePath();
   ctx.fill();
-  ctx.strokeStyle = '#38bdf8';
+  ctx.strokeStyle = '#08857b';
   ctx.lineWidth = 1.5;
   ctx.stroke();
 
-  // Tutup Tabung Pakan
-  ctx.fillStyle = '#0369a1';
+  ctx.fillStyle = '#0a3651';
   ctx.fillRect(x - 30, 48, 60, 8);
-
-  // Nozzle / Dispenser Pipa Ulir
-  ctx.fillStyle = '#1e293b';
   ctx.fillRect(x - 6, 115, 12, 16);
 }
 
-// Gambar Kincir Air (Paddlewheel Aerator) di Tengah
 function drawPaddlewheelAerator(ctx, waterLine, now) {
   const ax = 520;
   const ay = waterLine + 5;
 
-  // Ponton Pelampung Kuning
+  // Pelampung Kuning/Oranye
   ctx.fillStyle = '#f59e0b';
   ctx.strokeStyle = '#d97706';
   ctx.lineWidth = 2;
@@ -1184,15 +1202,12 @@ function drawPaddlewheelAerator(ctx, waterLine, now) {
   ctx.fill();
   ctx.stroke();
 
-  // Rangka Motor Listrik Tengah
-  ctx.fillStyle = '#334155';
+  // Motor Listrik WIRU Navy
+  ctx.fillStyle = '#0a3651';
   ctx.fillRect(ax - 18, ay - 26, 36, 20);
-
-  // Penutup motor
-  ctx.fillStyle = '#0284c7';
+  ctx.fillStyle = '#0aa094';
   ctx.fillRect(ax - 14, ay - 30, 28, 6);
 
-  // Putaran Bilah Kincir Aerator
   if (state.actuators.aerator) {
     aeratorAngle += 0.22;
   }
@@ -1201,36 +1216,32 @@ function drawPaddlewheelAerator(ctx, waterLine, now) {
   ctx.translate(ax, ay + 6);
   ctx.rotate(aeratorAngle);
 
-  // 6 Bilah Daun Kincir Air
-  ctx.fillStyle = '#e2e8f0';
-  ctx.strokeStyle = '#0284c7';
+  // Bilah Kincir
+  ctx.fillStyle = '#ffffff';
+  ctx.strokeStyle = '#0aa094';
   ctx.lineWidth = 1.5;
   for (let i = 0; i < 6; i++) {
     ctx.rotate((Math.PI * 2) / 6);
     ctx.fillRect(-3, -28, 6, 28);
-    // Sudip daun kincir
-    ctx.fillStyle = '#38bdf8';
+    ctx.fillStyle = '#0aa094';
     ctx.fillRect(-8, -30, 16, 5);
-    ctx.fillStyle = '#e2e8f0';
+    ctx.fillStyle = '#ffffff';
   }
 
-  // Hub poros kincir tengah
-  ctx.fillStyle = '#0f172a';
+  ctx.fillStyle = '#0a3651';
   ctx.beginPath();
   ctx.arc(0, 0, 7, 0, Math.PI * 2);
   ctx.fill();
   ctx.restore();
 }
 
-// Update & Gambar Butiran Pakan
 function updateAndDrawFeed(ctx, waterLine, h) {
-  ctx.fillStyle = '#92400e'; // Pelet pakan cokelat
+  ctx.fillStyle = '#92400e';
   for (let i = pondState.feedPellets.length - 1; i >= 0; i--) {
     const p = pondState.feedPellets[i];
     p.x += p.vx;
     p.y += p.vy;
 
-    // Jika masuk air, perlambat laju jatuhnya (daya apung air)
     if (p.y > waterLine) {
       p.vy = 0.5 + Math.random() * 0.4;
       p.vx *= 0.95;
@@ -1240,32 +1251,27 @@ function updateAndDrawFeed(ctx, waterLine, h) {
     ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
     ctx.fill();
 
-    // Hapus jika sudah menyentuh dasar kolam
     if (p.y > h - 10) {
       pondState.feedPellets.splice(i, 1);
     }
   }
 }
 
-// Update & Gambar Gelembung Udara & Percikan Air Kincir
 function updateAndDrawAeration(ctx, waterLine) {
   const ax = 520;
   const ay = waterLine + 5;
 
-  // Jika aerator aktif, generate percikan & gelembung baru
   if (state.actuators.aerator) {
-    // Percikan busa air putih di atas kincir
     for (let i = 0; i < 3; i++) {
       pondState.splashes.push({
         x: ax + (Math.random() - 0.5) * 45,
         y: ay - Math.random() * 8,
         vx: (Math.random() - 0.5) * 3,
         vy: -Math.random() * 3 - 1,
-        alpha: 0.8
+        alpha: 0.9
       });
     }
 
-    // Gelembung oksigen di bawah kincir menyebar ke kanan kolam
     for (let i = 0; i < 4; i++) {
       pondState.bubbles.push({
         x: ax + (Math.random() - 0.3) * 60,
@@ -1278,13 +1284,12 @@ function updateAndDrawAeration(ctx, waterLine) {
     }
   }
 
-  // Render Percikan
-  ctx.fillStyle = '#ffffff';
+  // Splashes
   for (let i = pondState.splashes.length - 1; i >= 0; i--) {
     const s = pondState.splashes[i];
     s.x += s.vx;
     s.y += s.vy;
-    s.vy += 0.2; // gravitasi
+    s.vy += 0.2;
     s.alpha -= 0.03;
 
     if (s.alpha <= 0 || s.y > waterLine + 5) {
@@ -1294,11 +1299,11 @@ function updateAndDrawAeration(ctx, waterLine) {
 
     ctx.fillStyle = `rgba(255, 255, 255, ${s.alpha})`;
     ctx.beginPath();
-    ctx.arc(s.x, s.y, 2, 0, Math.PI * 2);
+    ctx.arc(s.x, s.y, 2.2, 0, Math.PI * 2);
     ctx.fill();
   }
 
-  // Render Gelembung Udara Oksigen
+  // Bubbles
   for (let i = pondState.bubbles.length - 1; i >= 0; i--) {
     const b = pondState.bubbles[i];
     b.x += b.vx;
@@ -1310,57 +1315,43 @@ function updateAndDrawAeration(ctx, waterLine) {
       continue;
     }
 
-    ctx.fillStyle = `rgba(186, 230, 253, ${b.alpha})`;
+    ctx.fillStyle = `rgba(204, 251, 241, ${b.alpha})`;
     ctx.beginPath();
     ctx.arc(b.x, b.y, b.size, 0, Math.PI * 2);
     ctx.fill();
   }
 }
 
-// Update & Render Ikan / Udang
 function updateAndDrawFishes(ctx, waterLine, h, w) {
-  const isHypoxia = state.sensors.do < 5.0;
+  const isHypoxia = state.sensors.do < 5.00;
 
   pondState.fishes.forEach((fish) => {
     fish.tailPhase += 0.15;
 
-    // Respon adaptif terhadap kadar oksigen kolam:
     if (isHypoxia) {
-      // Oksigen kritis: ikan berenang lesu dan mengapung dekat permukaan air (mencari udara)
       const targetY = waterLine + 25 + Math.sin(fish.x * 0.01) * 15;
       fish.y += (targetY - fish.y) * 0.02;
-      fish.x += fish.vx * 0.4; // gerak lambat
+      fish.x += fish.vx * 0.4;
     } else {
-      // Oksigen cukup: ikan berenang bebas di kedalaman
       fish.x += fish.vx;
       fish.y += fish.vy;
 
-      // Pantul batas vertikal kedalaman kolam
       if (fish.y < waterLine + 30) fish.vy = Math.abs(fish.vy);
       if (fish.y > h - 30) fish.vy = -Math.abs(fish.vy);
     }
 
-    // Pantul batas horizontal kolam
-    if (fish.x < 120) {
-      fish.vx = Math.abs(fish.vx);
-    } else if (fish.x > w - 120) {
-      fish.vx = -Math.abs(fish.vx);
-    }
+    if (fish.x < 120) fish.vx = Math.abs(fish.vx);
+    else if (fish.x > w - 120) fish.vx = -Math.abs(fish.vx);
 
-    // Gambar Siluet Ikan
     ctx.save();
     ctx.translate(fish.x, fish.y);
-    if (fish.vx < 0) {
-      ctx.scale(-1, 1); // Balik hadap arah renang
-    }
+    if (fish.vx < 0) ctx.scale(-1, 1);
 
-    // Badan Ikan
     ctx.fillStyle = fish.color;
     ctx.beginPath();
     ctx.ellipse(0, 0, fish.size, fish.size * 0.45, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Sirip & Ekor Bergoyang
     const tailWiggle = Math.sin(fish.tailPhase) * 4;
     ctx.beginPath();
     ctx.moveTo(-fish.size + 2, 0);
@@ -1369,8 +1360,7 @@ function updateAndDrawFishes(ctx, waterLine, h, w) {
     ctx.closePath();
     ctx.fill();
 
-    // Mata Ikan
-    ctx.fillStyle = '#0f172a';
+    ctx.fillStyle = '#ffffff';
     ctx.beginPath();
     ctx.arc(fish.size * 0.5, -2, 2, 0, Math.PI * 2);
     ctx.fill();
@@ -1379,13 +1369,12 @@ function updateAndDrawFishes(ctx, waterLine, h, w) {
   });
 }
 
-// Gambar Label Penunjuk Komponen Visual
 function drawComponentLabels(ctx) {
   ctx.save();
   ctx.font = '10px "Plus Jakarta Sans", sans-serif';
-  ctx.fillStyle = '#e2e8f0';
-  ctx.strokeStyle = '#38bdf8';
-  ctx.lineWidth = 1;
+  ctx.fillStyle = '#0a3651'; // Deep Navy Text
+  ctx.strokeStyle = '#0aa094'; // WIRU Teal line
+  ctx.lineWidth = 1.2;
 
   // 1. Box Kontroler WIRU
   ctx.beginPath();
@@ -1401,6 +1390,7 @@ function drawComponentLabels(ctx) {
   ctx.lineTo(120, 290);
   ctx.lineTo(170, 290);
   ctx.stroke();
+  ctx.fillStyle = '#ffffff';
   ctx.fillText('Probe Sensor (DO, pH, Suhu)', 175, 293);
 
   // 3. Kincir Aerator
@@ -1409,6 +1399,7 @@ function drawComponentLabels(ctx) {
   ctx.lineTo(520, 110);
   ctx.lineTo(470, 110);
   ctx.stroke();
+  ctx.fillStyle = '#0a3651';
   ctx.fillText('Kincir Aerator Kolam', 360, 113);
 
   // 4. Auto Feeder

@@ -1,7 +1,7 @@
-/* Hallmark · shape: app screen · genre: modern-minimal · theme: Console (deal 3/3, seed smart-aquaculture-iot-dashboard-fe8d·c163a839·2026-11-14·r0)
- * nav: app header · signature: telemetry dials · states: normal alert offline · console: water quality controllers
- * axes: dark/grotesk-sans/chromatic-amber · posture: restrained · contrast: pass · v2.0.0 */
-/* Hallmark · pre-emit critique: P4 H4 E4 S4 R4 V4 · weakest: S, refined aquaculture scada grid */
+/* Hallmark · shape: app screen · genre: modern-minimal · theme: WIRU-Light (deal custom, brand-truth)
+ * nav: app header · signature: telemetry dials · states: normal alert offline · console: aquaculture operating system
+ * axes: light/grotesk-sans/chromatic-teal · posture: restrained · contrast: pass · v2.0.0 */
+/* Hallmark · pre-emit critique: P4 H4 E4 S4 R4 V4 · weakest: S, refined light aquaculture scada grid */
 
 @import url("./tokens.css");
 @import url("./base.css");
@@ -22,13 +22,21 @@ code, pre, .font-mono {
   font-family: var(--font-mono);
 }
 
-/* Industrial Tiled Panels (Jala & eFishery SCADA Style) */
+.text-wiru-navy {
+  color: var(--color-ink);
+}
+
+.bg-wiru-navy {
+  background-color: var(--color-ink);
+}
+
+/* WIRU Light Panels */
 .scada-panel {
   background: var(--color-paper-2);
   color: var(--color-ink);
   border: 1px solid var(--color-rule);
   border-radius: var(--radius-card);
-  padding: 1.25rem;
+  padding: var(--space-md);
   transition-property: border-color;
   transition-duration: var(--dur-short);
   transition-timing-function: var(--ease-out);
@@ -48,7 +56,7 @@ code, pre, .font-mono {
 
 /* Metric Display Cells */
 .telemetry-cell {
-  background: var(--color-paper-3);
+  background: var(--color-paper-2);
   color: var(--color-ink);
   border: 1px solid var(--color-rule);
   border-radius: var(--radius-pill);
@@ -59,7 +67,7 @@ code, pre, .font-mono {
 }
 
 .telemetry-cell:hover {
-  border-color: var(--color-cool);
+  border-color: var(--color-accent);
 }
 
 .status-badge {
@@ -75,13 +83,14 @@ code, pre, .font-mono {
   align-items: center;
   padding: 0.55rem 0.95rem;
   font-size: var(--text-sm);
-  font-weight: 500;
+  font-weight: 600;
   color: var(--color-muted);
   border-radius: var(--radius-pill);
   transition-property: color, background-color;
   transition-duration: var(--dur-micro);
   transition-timing-function: var(--ease-out);
   white-space: nowrap;
+  cursor: pointer;
 }
 
 .nav-tab:hover {
@@ -92,7 +101,6 @@ code, pre, .font-mono {
 .nav-tab.active {
   color: var(--color-accent-ink);
   background-color: var(--color-accent);
-  font-weight: 600;
 }
 
 .nav-tab:focus-visible {
@@ -119,7 +127,7 @@ code, pre, .font-mono {
   position: absolute;
   cursor: pointer;
   inset: 0;
-  background-color: var(--color-rule);
+  background-color: var(--color-rule-2);
   transition-property: background-color;
   transition-duration: var(--dur-short);
   transition-timing-function: var(--ease-out);
@@ -133,7 +141,7 @@ code, pre, .font-mono {
   width: 16px;
   left: 4px;
   bottom: 4px;
-  background-color: var(--color-ink);
+  background-color: var(--color-paper-2);
   transition-property: transform;
   transition-duration: var(--dur-short);
   transition-timing-function: var(--ease-out);
@@ -141,7 +149,7 @@ code, pre, .font-mono {
 }
 
 input:checked + .slider {
-  background-color: var(--color-ok);
+  background-color: var(--color-accent);
 }
 
 input:checked + .slider:before {
@@ -178,11 +186,11 @@ input:checked + .slider:before {
   gap: var(--space-xs);
   padding: var(--space-xs) var(--space-sm);
   border-radius: var(--radius-pill);
-  background-color: var(--color-paper-3);
+  background-color: var(--color-paper-2);
   color: var(--color-ink);
-  border: 1px solid var(--color-rule);
+  border: 1px solid var(--color-rule-2);
   font-size: var(--text-xs);
-  font-weight: 500;
+  font-weight: 600;
   transition-property: border-color, background-color, transform;
   transition-duration: var(--dur-short);
   transition-timing-function: var(--ease-out);
@@ -191,12 +199,26 @@ input:checked + .slider:before {
 }
 
 .scada-btn:hover {
-  background-color: var(--color-paper-2);
-  border-color: var(--color-rule-2);
+  background-color: var(--color-accent-soft);
+  border-color: var(--color-accent);
+  color: var(--color-ink);
 }
 
 .scada-btn:active, button:active {
   transform: scale(0.98);
+}
+
+/* Primary Action Button (WIRU Teal) */
+.scada-btn-primary {
+  background-color: var(--color-accent);
+  color: var(--color-accent-ink);
+  border: 1px solid var(--color-accent);
+}
+
+.scada-btn-primary:hover {
+  background-color: var(--color-accent);
+  filter: brightness(0.95);
+  color: var(--color-accent-ink);
 }
 
 button:disabled, input:disabled, select:disabled {
@@ -212,7 +234,7 @@ button:disabled, input:disabled, select:disabled {
   gap: var(--space-sm);
   padding: var(--space-sm);
   border-radius: var(--radius-card);
-  background-color: var(--color-paper-3);
+  background-color: var(--color-paper-2);
   color: var(--color-ink);
   border: 1px solid var(--color-rule);
   transition-property: border-color, background-color, transform;
@@ -222,38 +244,12 @@ button:disabled, input:disabled, select:disabled {
 }
 
 .scenario-btn:hover {
-  background-color: var(--color-paper-2);
-  border-color: var(--color-rule-2);
+  background-color: var(--color-accent-soft);
+  border-color: var(--color-accent);
 }
 
 .scenario-btn:active {
   transform: scale(0.98);
-}
-
-/* Layer Architecture Cards */
-.arch-layer {
-  border-radius: var(--radius-card);
-  padding: 1.15rem;
-  border: 1px solid var(--color-rule);
-  background: var(--color-paper-3);
-  transition-property: border-color;
-  transition-duration: var(--dur-short);
-  transition-timing-function: var(--ease-out);
-}
-
-.arch-layer:hover {
-  border-color: var(--color-rule-2);
-}
-
-.layer-number {
-  width: 1.5rem;
-  height: 1.5rem;
-  border-radius: var(--radius-pill);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: var(--text-xs);
 }
 
 /* Custom Scrollbar */
@@ -267,12 +263,12 @@ button:disabled, input:disabled, select:disabled {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-rule);
+  background: var(--color-rule-2);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-rule-2);
+  background: var(--color-muted);
 }
 
 @keyframes spin-slow {
