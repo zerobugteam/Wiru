@@ -54,6 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initSliders();
   initScenarios();
   initTerminal();
+  initHardwareView();
   renderLogs();
   applyRolePermissions();
   startAutoStream();

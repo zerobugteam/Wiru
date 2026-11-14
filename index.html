@@ -84,6 +84,9 @@
         <button class="nav-tab active" data-tab="tab-dashboard">
           Dashboard Monitoring
         </button>
+        <button class="nav-tab" data-tab="tab-hardware">
+          Visual Perangkat IoT &amp; Tambak
+        </button>
         <button class="nav-tab" data-tab="tab-simulator">
           Simulator Sensor &amp; Alur IoT
         </button>
@@ -328,7 +331,242 @@
 
     </div>
 
-    <!-- TAB 2: SIMULATOR SENSOR & ALUR IOT -->
+    <!-- TAB 2: VISUAL PERANGKAT IOT & TAMBAK (DIGITAL TWIN) -->
+    <div id="tab-hardware" class="tab-content hidden space-y-5">
+
+      <!-- Header & Kontrol Tampilan -->
+      <div class="metric-card space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="text-base font-semibold text-stone-100">Visual Fisik Perangkat IoT dan Kolam Tambak</h2>
+            <p class="text-xs text-stone-400">
+              Digital twin kolam tambak Puger: memperlihatkan kincir aerator, sebaran gelembung oksigen, gerak ikan, unit pakan otomatis, dan box kontroler outdoor.
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="btnToggleLabels" class="text-xs px-3 py-1.5 rounded bg-stone-800 hover:bg-stone-700 text-stone-300 font-medium transition-colors">
+              Label Komponen: Aktif
+            </button>
+            <span class="text-xs px-2.5 py-1 rounded bg-stone-900 border border-stone-800 text-stone-400 font-mono">
+              FPS: <span id="pondFps" class="text-stone-200">60</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Kolam Tambak Interaktif Canvas -->
+        <div class="relative w-full rounded-xl overflow-hidden border border-stone-800 bg-stone-950">
+          <canvas id="pondCanvas" width="1080" height="380" class="w-full h-[320px] sm:h-[380px] block" aria-label="Visualisasi Interaktif Kolam Tambak dan Perangkat IoT"></canvas>
+
+          <!-- Floating Badges on Pond Canvas -->
+          <div class="absolute top-3 left-3 flex flex-wrap gap-2 pointer-events-none">
+            <div id="pondWaterStatusBadge" class="px-2.5 py-1 rounded-md bg-stone-900/90 backdrop-blur border border-stone-700 text-stone-200 text-xs font-medium flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span>Air Kolam: Kondisi Sehat</span>
+            </div>
+            <div id="pondAeratorStatusBadge" class="px-2.5 py-1 rounded-md bg-stone-900/90 backdrop-blur border border-stone-700 text-stone-300 text-xs font-medium">
+              Aerator: Diam
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Interaction Bar under Canvas -->
+        <div class="flex flex-wrap items-center justify-between gap-2.5 pt-2 text-xs">
+          <div class="flex items-center gap-2">
+            <span class="text-stone-400">Aksi Cepat:</span>
+            <button id="btnQuickPondAerator" class="px-3 py-1.5 rounded bg-stone-800 hover:bg-stone-700 text-stone-200 font-medium transition-colors">
+              Nyalakan Kincir Aerator
+            </button>
+            <button id="btnQuickPondFeeder" class="px-3 py-1.5 rounded bg-stone-800 hover:bg-stone-700 text-stone-200 font-medium transition-colors">
+              Lontarkan Pelet Pakan
+            </button>
+          </div>
+          <div class="text-stone-400 text-[11px]">
+            Tip: Naik-turunkan nilai DO di tab simulator untuk melihat perilaku ikan di dalam kolam.
+          </div>
+        </div>
+      </div>
+
+      <!-- Dua Kolom: Box Panel Controller & Skematik Wiring -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
+        <!-- Visualisasi Box Panel Kontroler Outdoor IP66 -->
+        <div class="metric-card space-y-4">
+          <div class="flex items-center justify-between pb-2 border-b border-stone-800">
+            <div>
+              <h3 class="text-sm font-semibold text-stone-100">Box Panel Kontroler WIRU (IP66 Outdoor)</h3>
+              <p class="text-xs text-stone-400">Panel tahan cuaca dan korosi air payau pesisir Puger</p>
+            </div>
+            <span class="text-xs px-2 py-0.5 rounded bg-stone-900 text-stone-300 border border-stone-700 font-mono">
+              ESP32 Unit
+            </span>
+          </div>
+
+          <!-- Rangka Visual Box Panel -->
+          <div class="p-4 rounded-xl bg-stone-900 border-2 border-stone-700 space-y-4 shadow-inner">
+            
+            <!-- Bagian Atas Box: Layar OLED dan Status LED -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+
+              <!-- Layar OLED 0.96 inci Monokrom -->
+              <div class="p-3 rounded-lg bg-black border-2 border-stone-800 font-mono text-[11px] leading-tight select-none shadow">
+                <div class="flex justify-between items-center text-cyan-400 border-b border-cyan-900/60 pb-1 mb-1.5 font-bold">
+                  <span>WIRU IOT v1.0</span>
+                  <span id="oledWifiStatus">WIFI:OK</span>
+                </div>
+                <div class="text-cyan-200 space-y-1">
+                  <div class="flex justify-between">
+                    <span>DO  : <b id="oledDO" class="text-white">5.4</b> mg/L</span>
+                    <span id="oledDOStatus">[NORM]</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>TEMP: <b id="oledTemp" class="text-white">28.5</b>C</span>
+                    <span>PH: <b id="oledPH" class="text-white">7.4</b></span>
+                  </div>
+                  <div class="flex justify-between text-[10px] text-cyan-400 pt-0.5 border-t border-cyan-950">
+                    <span>AERATOR: <b id="oledAerator">OFF</b></span>
+                    <span>FEED: AUTO</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Barisan Lampu Indikator LED Fisik -->
+              <div class="bg-stone-950 p-3 rounded-lg border border-stone-800 space-y-2 text-xs">
+                <div class="text-[11px] font-semibold text-stone-400 mb-1">Indikator LED Panel:</div>
+                
+                <!-- LED Power -->
+                <div class="flex items-center justify-between">
+                  <span class="text-stone-300">PWR (12V DC)</span>
+                  <span class="flex items-center gap-1.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
+                    <span class="text-[10px] text-stone-400 font-mono">ON</span>
+                  </span>
+                </div>
+
+                <!-- LED Wi-Fi / MQTT -->
+                <div class="flex items-center justify-between">
+                  <span class="text-stone-300">NET (Wi-Fi/MQTT)</span>
+                  <span class="flex items-center gap-1.5">
+                    <span id="hwLedNet" class="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)] animate-pulse"></span>
+                    <span id="hwLedNetText" class="text-text-stone-400 font-mono text-[10px]">LINK</span>
+                  </span>
+                </div>
+
+                <!-- LED Relay Aerator -->
+                <div class="flex items-center justify-between">
+                  <span class="text-stone-300">AER (Relay Kincir)</span>
+                  <span class="flex items-center gap-1.5">
+                    <span id="hwLedAerator" class="w-2.5 h-2.5 rounded-full bg-stone-700 transition-colors"></span>
+                    <span id="hwLedAeratorText" class="text-stone-400 font-mono text-[10px]">IDLE</span>
+                  </span>
+                </div>
+
+                <!-- LED Alarm -->
+                <div class="flex items-center justify-between">
+                  <span class="text-stone-300">ALM (Batas Kritis)</span>
+                  <span class="flex items-center gap-1.5">
+                    <span id="hwLedAlarm" class="w-2.5 h-2.5 rounded-full bg-stone-700 transition-colors"></span>
+                    <span id="hwLedAlarmText" class="text-stone-400 font-mono text-[10px]">OFF</span>
+                  </span>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Bagian Bawah: Saklar Fisik & Cable Gland -->
+            <div class="pt-3 border-t border-stone-800 flex flex-wrap items-center justify-between gap-3 text-xs">
+              <div class="flex items-center gap-2">
+                <span class="text-stone-400 text-[11px]">Tombol Panel Fisik:</span>
+                <button id="hwPanelBtnAerator" class="px-2.5 py-1 rounded bg-stone-800 hover:bg-stone-700 text-stone-300 border border-stone-700 transition-colors">
+                  Uji Saklar Kincir
+                </button>
+              </div>
+              <div class="flex items-center gap-2 text-stone-400 text-[11px] font-mono">
+                <span>Output: 4x PG9 Cable Glands Waterproof</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Spesifikasi Hardware & Skematik Pinout ESP32 -->
+        <div class="metric-card space-y-3.5">
+          <div class="flex items-center justify-between pb-2 border-b border-stone-800">
+            <div>
+              <h3 class="text-sm font-semibold text-stone-100">Spesifikasi Modul &amp; Jalur Pinout ESP32</h3>
+              <p class="text-xs text-stone-400">Wiring diagram koneksi mikrokontroler ke sensor dan aktuator</p>
+            </div>
+            <span class="text-xs px-2 py-0.5 rounded bg-stone-900 text-stone-300 border border-stone-700 font-mono">
+              Pinout Table
+            </span>
+          </div>
+
+          <div class="overflow-x-auto rounded border border-stone-800">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-stone-900 text-stone-300 font-medium text-[11px]">
+                <tr>
+                  <th class="p-2">Pin ESP32</th>
+                  <th class="p-2">Perangkat Terhubung</th>
+                  <th class="p-2">Tipe Sinyal</th>
+                  <th class="p-2">Fungsi Utama</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-stone-800 font-mono text-stone-300 text-[11px]">
+                <tr>
+                  <td class="p-2 text-amber-300 font-bold">GPIO 23</td>
+                  <td class="p-2">Modul Relay 30A</td>
+                  <td class="p-2 text-stone-400">Digital Out</td>
+                  <td class="p-2">Saklar Kincir Aerator (220V AC)</td>
+                </tr>
+                <tr>
+                  <td class="p-2 text-amber-300 font-bold">GPIO 19</td>
+                  <td class="p-2">Modul Relay 10A</td>
+                  <td class="p-2 text-stone-400">Digital Out</td>
+                  <td class="p-2">Pompa Celup Sirkulasi Air</td>
+                </tr>
+                <tr>
+                  <td class="p-2 text-amber-300 font-bold">GPIO 18</td>
+                  <td class="p-2">Motor Servo MG996R</td>
+                  <td class="p-2 text-stone-400">PWM Signal</td>
+                  <td class="p-2">Pemberi Pakan Ikan Otomatis</td>
+                </tr>
+                <tr>
+                  <td class="p-2 text-cyan-300 font-bold">GPIO 4</td>
+                  <td class="p-2">Sensor DS18B20</td>
+                  <td class="p-2 text-stone-400">OneWire Bus</td>
+                  <td class="p-2">Monitoring Suhu Air Tambak</td>
+                </tr>
+                <tr>
+                  <td class="p-2 text-cyan-300 font-bold">GPIO 34</td>
+                  <td class="p-2">Probe Oksigen (DO)</td>
+                  <td class="p-2 text-stone-400">Analog ADC (12-bit)</td>
+                  <td class="p-2">Kadar Oksigen Terlarut (mg/L)</td>
+                </tr>
+                <tr>
+                  <td class="p-2 text-cyan-300 font-bold">GPIO 35</td>
+                  <td class="p-2">Elektroda pH-4502C</td>
+                  <td class="p-2 text-stone-400">Analog ADC (12-bit)</td>
+                  <td class="p-2">Kadar Keasaman Air Kolam</td>
+                </tr>
+                <tr>
+                  <td class="p-2 text-stone-400 font-bold">GPIO 21/22</td>
+                  <td class="p-2">OLED SSD1306 0.96"</td>
+                  <td class="p-2 text-stone-400">I2C (SDA/SCL)</td>
+                  <td class="p-2">Tampilan Langsung di Panel</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="p-3 rounded-lg bg-stone-900 border border-stone-800 text-xs text-stone-400 leading-relaxed">
+            <span class="font-semibold text-stone-200">Proteksi Lapangan:</span> Menggunakan optocoupler isolator pada relay untuk meredam arus balik induktif kincir air, serta buck converter teregulasi 12V ke 5V/3.3V dengan diode proteksi polaritas terbalik.
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- TAB 3: SIMULATOR SENSOR & ALUR IOT -->
     <div id="tab-simulator" class="tab-content hidden space-y-6">
 
       <div class="metric-card space-y-4">
