@@ -49,3 +49,39 @@
   --shadow-card: none;
   --tracking-display: -0.02em; --display-weight: 500;
 }
+
+/* WIRU Light Theme Tokens (Restrained Craft, Subtle Teal Tint) */
+[data-theme="light"] {
+  color-scheme: light;
+
+  /* Refined Light Surfaces (No harsh pure #fff) */
+  --color-sidebar: #f3f6f7;                     /* Coastal oyster sidebar */
+  --color-paper: #eaeff1;                       /* Clean slate canvas */
+  --color-paper-2: #fafcfd;                     /* Subtle tinted card */
+  --color-paper-3: #f0f4f6;                     /* Raised subtle surface */
+  --color-paper-hover: #e2e8eb;                 /* Hover state */
+
+  /* Light Inks */
+  --color-ink: #0c161d;                         /* Deep marine charcoal */
+  --color-ink-2: #2b3943;                       /* Slate secondary text */
+  --color-muted: #5a6b77;                       /* Muted metadata */
+
+  /* Hairline Rules */
+  --color-rule: rgba(12, 22, 29, 0.08);         /* Clean hairline 8% */
+  --color-rule-2: rgba(12, 22, 29, 0.14);       /* Card border 14% */
+
+  /* Brand Accent: WIRU Teal #0aa094 */
+  --color-accent: #0aa094;
+  --color-accent-ink: #f0fdfa;
+  --color-accent-soft: rgba(10, 160, 148, 0.12);
+  --color-focus: #0aa094;
+
+  --color-cool: #0284c7;
+  --color-cool-soft: rgba(2, 132, 199, 0.12);
+  --color-ok: #16a34a;
+  --color-ok-soft: rgba(22, 163, 74, 0.12);
+  --color-bad: #e11d48;
+  --color-bad-soft: rgba(225, 29, 72, 0.12);
+  --color-warn: #d97706;
+  --color-violet: #7c3aed;
+}

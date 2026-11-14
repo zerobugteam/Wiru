@@ -47,6 +47,7 @@ let siloRemainingKg = 15.6;
 
 // --- Inisialisasi Saat Dokumen Siap ---
 document.addEventListener('DOMContentLoaded', () => {
+  try { initThemeToggle(); } catch (e) { console.warn('Theme error:', e); }
   try { initLucide(); } catch (e) { console.warn('Lucide error:', e); }
   try { initClock(); } catch (e) { console.warn('Clock error:', e); }
   try { initTabs(); } catch (e) { console.warn('Tabs error:', e); }
@@ -67,6 +68,89 @@ function initLucide() {
   if (window.lucide) {
     lucide.createIcons();
   }
+}
+
+// --- Manajemen Tema Terang / Gelap (Light & Dark Theme) ---
+function getCurrentTheme() {
+  return document.documentElement.getAttribute('data-theme') || 'dark';
+}
+
+function initThemeToggle() {
+  const btn = document.getElementById('themeToggleBtn');
+  const savedTheme = localStorage.getItem('wiru_theme') || 'dark';
+  applyTheme(savedTheme, false);
+
+  if (btn) {
+    btn.addEventListener('click', () => {
+      const current = getCurrentTheme();
+      const nextTheme = current === 'light' ? 'dark' : 'light';
+      applyTheme(nextTheme, true);
+    });
+  }
+}
+
+function applyTheme(theme, showNotification = false) {
+  document.documentElement.setAttribute('data-theme', theme);
+  try { localStorage.setItem('wiru_theme', theme); } catch (e) {}
+
+  const icon = document.getElementById('themeToggleIcon');
+  const text = document.getElementById('themeToggleText');
+  const btn = document.getElementById('themeToggleBtn');
+
+  if (theme === 'light') {
+    if (icon) {
+      icon.setAttribute('data-lucide', 'moon');
+      icon.className = 'w-3.5 h-3.5 text-indigo-500';
+    }
+    if (text) text.innerText = 'Gelap';
+    if (btn) btn.title = 'Ubah ke Tema Gelap (Dark Mode)';
+  } else {
+    if (icon) {
+      icon.setAttribute('data-lucide', 'sun');
+      icon.className = 'w-3.5 h-3.5 text-amber-400';
+    }
+    if (text) text.innerText = 'Terang';
+    if (btn) btn.title = 'Ubah ke Tema Terang (Light Mode)';
+  }
+
+  initLucide();
+  applyChartTheme(theme);
+
+  if (showNotification) {
+    showToast(theme === 'light' ? 'Mode Terang diaktifkan.' : 'Mode Gelap diaktifkan.', 'info');
+  }
+}
+
+function applyChartTheme(theme) {
+  if (!chartInstance) return;
+
+  const isLight = theme === 'light';
+  const gridColor = isLight ? 'rgba(15, 23, 42, 0.06)' : 'rgba(255, 255, 255, 0.03)';
+  const tickColor = isLight ? '#64748b' : '#85858b';
+  const tooltipBg = isLight ? '#ffffff' : '#0f0f10';
+  const tooltipTitle = isLight ? '#0f172a' : '#ededed';
+  const tooltipBody = isLight ? '#334155' : '#a1a1a6';
+  const tooltipBorder = isLight ? 'rgba(15, 23, 42, 0.12)' : 'rgba(255, 255, 255, 0.12)';
+
+  if (chartInstance.options.scales.x) {
+    chartInstance.options.scales.x.grid.color = gridColor;
+    chartInstance.options.scales.x.ticks.color = tickColor;
+  }
+
+  if (chartInstance.options.plugins && chartInstance.options.plugins.tooltip) {
+    chartInstance.options.plugins.tooltip.backgroundColor = tooltipBg;
+    chartInstance.options.plugins.tooltip.titleColor = tooltipTitle;
+    chartInstance.options.plugins.tooltip.bodyColor = tooltipBody;
+    chartInstance.options.plugins.tooltip.borderColor = tooltipBorder;
+  }
+
+  // Update Dataset 4 (Delta baseline silhouette)
+  if (chartInstance.data.datasets && chartInstance.data.datasets[4]) {
+    chartInstance.data.datasets[4].borderColor = isLight ? 'rgba(15, 23, 42, 0.22)' : 'rgba(255, 255, 255, 0.22)';
+    chartInstance.data.datasets[4].backgroundColor = isLight ? 'rgba(15, 23, 42, 0.03)' : 'rgba(255, 255, 255, 0.02)';
+  }
+
+  chartInstance.update('none');
 }
 
 // --- Live Clock Real-Time ---
@@ -330,6 +414,8 @@ function initChart() {
       showToast('Riwayat telemetri di-reset ke waktu saat ini.', 'info');
     });
   }
+
+  applyChartTheme(getCurrentTheme());
 }
 
 // Update grafik dengan data terbaru (Live Streaming)
@@ -1175,16 +1261,23 @@ function renderPondScene(now) {
   const h = pondCanvas.height;
   const waterLine = 175;
 
-  // 1. Langit Malam Pesisir Puger (Unslop Graphite Dark)
+  // 1. Langit Pesisir Puger (Responsif Mode Terang / Gelap)
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
   const skyGrad = pondCtx.createLinearGradient(0, 0, 0, waterLine);
-  skyGrad.addColorStop(0, '#0f141c');
-  skyGrad.addColorStop(0.7, '#151c27');
-  skyGrad.addColorStop(1, '#1a2433');
+  if (isLight) {
+    skyGrad.addColorStop(0, '#e0f2fe');
+    skyGrad.addColorStop(0.7, '#bae6fd');
+    skyGrad.addColorStop(1, '#93c5fd');
+  } else {
+    skyGrad.addColorStop(0, '#0f141c');
+    skyGrad.addColorStop(0.7, '#151c27');
+    skyGrad.addColorStop(1, '#1a2433');
+  }
   pondCtx.fillStyle = skyGrad;
   pondCtx.fillRect(0, 0, w, waterLine);
 
   // Siluet Bukit Kapur Pesisir Puger
-  pondCtx.fillStyle = '#1e293b';
+  pondCtx.fillStyle = isLight ? '#94a3b8' : '#1e293b';
   pondCtx.beginPath();
   pondCtx.moveTo(0, waterLine);
   pondCtx.lineTo(60, 130);
@@ -1200,13 +1293,25 @@ function renderPondScene(now) {
   const isHypoxia = state.sensors.do < 5.00;
   const waterGrad = pondCtx.createLinearGradient(0, waterLine, 0, h);
   if (isHypoxia) {
-    waterGrad.addColorStop(0, '#0c2225');
-    waterGrad.addColorStop(0.5, '#081719');
-    waterGrad.addColorStop(1, '#050f11');
+    if (isLight) {
+      waterGrad.addColorStop(0, '#ffe4e6');
+      waterGrad.addColorStop(0.5, '#fecdd3');
+      waterGrad.addColorStop(1, '#fda4af');
+    } else {
+      waterGrad.addColorStop(0, '#0c2225');
+      waterGrad.addColorStop(0.5, '#081719');
+      waterGrad.addColorStop(1, '#050f11');
+    }
   } else {
-    waterGrad.addColorStop(0, '#0a2f38');
-    waterGrad.addColorStop(0.5, '#071f25');
-    waterGrad.addColorStop(1, '#05151a');
+    if (isLight) {
+      waterGrad.addColorStop(0, '#ccfbf1');
+      waterGrad.addColorStop(0.5, '#5eead4');
+      waterGrad.addColorStop(1, '#2dd4bf');
+    } else {
+      waterGrad.addColorStop(0, '#0a2f38');
+      waterGrad.addColorStop(0.5, '#071f25');
+      waterGrad.addColorStop(1, '#05151a');
+    }
   }
   pondCtx.fillStyle = waterGrad;
   pondCtx.fillRect(0, waterLine, w, h - waterLine);

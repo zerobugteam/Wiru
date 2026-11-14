@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=3.1">
+  <link rel="stylesheet" href="style.css?v=3.2">
 </head>
 <body class="h-screen w-screen overflow-hidden flex bg-paper text-ink">
 
@@ -29,14 +29,14 @@
     
     <!-- Top Brand Header: Logo murni tanpa card/kotak -->
     <div class="h-16 px-4 border-b border-rule flex items-center justify-between">
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-3 min-w-0">
         <img src="assets/wiru.png" alt="Logo WIRU" class="h-10 w-10 object-contain shrink-0">
-        <div>
+        <div class="min-w-0">
           <span class="font-bold text-base tracking-normal text-ink font-mono block leading-tight">WIRU</span>
-          <span class="text-[10px] text-neutral-400 font-mono block">Smart aquaculture</span>
+          <span class="text-[8.5px] text-neutral-400 font-mono block leading-tight truncate" title="Water Intelligence for Raising Underwater life">Water Intelligence for Raising Underwater life</span>
         </div>
       </div>
-      <span class="px-1.5 py-0.5 text-[9px] rounded bg-teal-500/10 text-teal-400 font-mono border border-teal-500/20 font-medium">v1.2</span>
+      <span class="px-1.5 py-0.5 text-[9px] rounded bg-teal-500/10 text-teal-400 font-mono border border-teal-500/20 font-medium shrink-0 ml-1.5">v1.2</span>
     </div>
 
     <!-- Search Input (Unslop Reference Pattern with Keycap) -->
@@ -87,33 +87,6 @@
         </nav>
       </div>
 
-      <!-- Section: Parameter Tambak (Unslop Reference "Plans" Pattern) -->
-      <div>
-        <div class="text-[11px] font-mono text-neutral-500 px-2.5 mb-1.5">Parameter kolam</div>
-        <div class="space-y-0.5 text-xs">
-          <div class="flex items-center justify-between px-2.5 py-1 rounded text-neutral-400">
-            <span>Oksigen (DO)</span>
-            <span class="font-mono text-neutral-200">5.40 mg/L</span>
-          </div>
-          <div class="flex items-center justify-between px-2.5 py-1 rounded text-neutral-400">
-            <span>Suhu air</span>
-            <span class="font-mono text-neutral-200">28.5 °C</span>
-          </div>
-          <div class="flex items-center justify-between px-2.5 py-1 rounded text-neutral-400">
-            <span>pH air</span>
-            <span class="font-mono text-neutral-200">7.40</span>
-          </div>
-          <div class="flex items-center justify-between px-2.5 py-1 rounded text-neutral-400">
-            <span>Salinitas</span>
-            <span class="font-mono text-neutral-200">18 ppt</span>
-          </div>
-          <div class="flex items-center justify-between px-2.5 py-1 rounded text-neutral-400">
-            <span>Kekeruhan</span>
-            <span class="font-mono text-neutral-200">32 NTU</span>
-          </div>
-        </div>
-      </div>
-
     </div>
 
     <!-- Sidebar Bottom Hardware Status -->
@@ -157,8 +130,14 @@
         </div>
       </div>
 
-      <!-- Right: Role & Live Clock -->
-      <div class="flex items-center gap-3 text-xs">
+      <!-- Right: Theme Switcher, Role & Live Clock -->
+      <div class="flex items-center gap-2.5 text-xs">
+        <!-- Theme Switcher (Dark / Light) -->
+        <button id="themeToggleBtn" type="button" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-paper-2 border border-rule text-neutral-300 hover:text-ink transition-colors cursor-pointer" title="Ubah Tema Terang / Gelap">
+          <i data-lucide="sun" id="themeToggleIcon" class="w-3.5 h-3.5 text-amber-400"></i>
+          <span id="themeToggleText" class="font-mono text-[11px]">Terang</span>
+        </button>
+
         <div class="flex items-center gap-1.5 bg-paper-2 px-2.5 py-1.5 rounded-lg border border-rule">
           <i data-lucide="shield" class="w-3.5 h-3.5 text-neutral-500"></i>
           <span class="text-neutral-400">Peran:</span>
@@ -1012,6 +991,6 @@ void evaluasiOksigen(float kadarDO) {
   <!-- TOAST CONTAINER (Top Center Floating Pill) -->
   <div id="toastContainer" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 space-y-2 pointer-events-none flex flex-col items-center"></div>
 
-  <script src="app.js?v=3.2"></script>
+  <script src="app.js?v=3.3"></script>
 </body>
 </html>
