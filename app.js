@@ -117,114 +117,97 @@ function initChart() {
   if (!chartEl) return;
   const ctx = chartEl.getContext('2d');
 
-  // Exact Months and Bell Curve Shape from unslop-dashboard-after.webp
-  const labels = ['Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan'];
+  // Initial 12 rolling real-time points up to current time
+  const rollingPoints = 12;
+  const initialLabels = [];
+  const doData = [];
+  const criticalLimitData = [];
+  const tempData = [];
+  const phData = [];
+  const mirrorDeltaData = [];
+
+  const nowMs = Date.now();
+  for (let i = rollingPoints - 1; i >= 0; i--) {
+    const t = new Date(nowMs - i * 3000);
+    initialLabels.push(t.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+    
+    const baseDO = 5.36 + Math.sin((rollingPoints - i) * 0.4) * 0.12;
+    doData.push(parseFloat(baseDO.toFixed(2)));
+    criticalLimitData.push(5.00);
+    tempData.push(parseFloat((28.4 + Math.cos(i * 0.3) * 0.15).toFixed(1)));
+    phData.push(parseFloat((7.38 + Math.sin(i * 0.2) * 0.04).toFixed(2)));
+    mirrorDeltaData.push(parseFloat((-(Math.abs(baseDO - 5.40) * 1.5 + 0.4)).toFixed(2)));
+  }
 
   chartInstance = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: labels,
+      labels: initialLabels,
       datasets: [
-        // 1. Golden Yellow Curve - DO Peak
+        // 1. Oksigen Terlarut (DO mg/L) - WIRU Teal #0aa094
         {
-          label: 'Oksigen (DO Peak)',
-          data: [0, 38, 160, 115, 25, 0],
+          label: 'Oksigen (DO)',
+          data: doData,
+          borderColor: '#0aa094',
+          backgroundColor: 'rgba(10, 160, 148, 0.08)',
+          fill: true,
+          tension: 0.4,
+          borderWidth: 2.5,
+          pointRadius: 0,
+          pointHoverRadius: 5,
+          pointHoverBackgroundColor: '#0aa094',
+          yAxisID: 'y'
+        },
+        // 2. Ambang Kritis 5.00 mg/L (Amber Warning Line)
+        {
+          label: 'Ambang Kritis (5.00 mg/L)',
+          data: criticalLimitData,
           borderColor: '#f59e0b',
-          backgroundColor: 'transparent',
-          tension: 0.45,
-          borderWidth: 2.2,
+          borderDash: [5, 5],
+          borderWidth: 1.5,
           pointRadius: 0,
-          pointHoverRadius: 5,
-          pointHoverBackgroundColor: '#f59e0b'
+          pointHoverRadius: 0,
+          fill: false,
+          yAxisID: 'y'
         },
-        // 2. Mint / Teal - Biomassa Tambak
+        // 3. Suhu Air (°C) - Coral Rose #f43f5e
         {
-          label: 'Biomassa Vaname',
-          data: [0, 28, 126, 90, 18, 0],
-          borderColor: '#10b981',
-          backgroundColor: 'transparent',
-          tension: 0.45,
-          borderWidth: 2,
-          pointRadius: 0,
-          pointHoverRadius: 5,
-          pointHoverBackgroundColor: '#10b981'
-        },
-        // 3. Sky Blue - Suhu Air
-        {
-          label: 'Suhu Air (28.5°C)',
-          data: [0, 20, 95, 68, 14, 0],
-          borderColor: '#38bdf8',
-          backgroundColor: 'transparent',
-          tension: 0.45,
-          borderWidth: 2,
-          pointRadius: 0,
-          pointHoverRadius: 5,
-          pointHoverBackgroundColor: '#38bdf8'
-        },
-        // 4. Pink / Rose - pH Kolam
-        {
-          label: 'Derajat pH (7.4)',
-          data: [0, 14, 68, 48, 10, 0],
+          label: 'Suhu Air (°C)',
+          data: tempData,
           borderColor: '#f43f5e',
-          backgroundColor: 'transparent',
-          tension: 0.45,
+          tension: 0.4,
           borderWidth: 2,
           pointRadius: 0,
-          pointHoverRadius: 5,
-          pointHoverBackgroundColor: '#f43f5e'
+          pointHoverRadius: 4,
+          pointHoverBackgroundColor: '#f43f5e',
+          fill: false,
+          yAxisID: 'y1'
         },
-        // 5. Purple - Salinitas Air
+        // 4. pH Air Kolam - Sky Blue #38bdf8
         {
-          label: 'Salinitas Air',
-          data: [0, 9, 44, 32, 6, 0],
-          borderColor: '#a855f7',
-          backgroundColor: 'transparent',
-          tension: 0.45,
-          borderWidth: 2,
+          label: 'pH Air',
+          data: phData,
+          borderColor: '#38bdf8',
+          tension: 0.4,
+          borderWidth: 1.8,
           pointRadius: 0,
-          pointHoverRadius: 5,
-          pointHoverBackgroundColor: '#a855f7'
+          pointHoverRadius: 4,
+          pointHoverBackgroundColor: '#38bdf8',
+          fill: false,
+          yAxisID: 'y'
         },
-        // Mirrored Comparison Silhouette Curves (Below Line 0, Dark Translucent Grey)
+        // 5. Mirrored Comparison Delta (Historical Baseline, Below 0)
         {
-          label: 'Komparasi Baseline 1',
-          data: [0, -8, -36, -26, -5, 0],
-          borderColor: 'rgba(255, 255, 255, 0.28)',
-          backgroundColor: 'transparent',
-          tension: 0.45,
+          label: 'Baseline Kemarin (Δ)',
+          data: mirrorDeltaData,
+          borderColor: 'rgba(255, 255, 255, 0.22)',
+          backgroundColor: 'rgba(255, 255, 255, 0.02)',
+          fill: true,
+          tension: 0.4,
           borderWidth: 1.5,
           pointRadius: 0,
-          pointHoverRadius: 0
-        },
-        {
-          label: 'Komparasi Baseline 2',
-          data: [0, -14, -58, -42, -9, 0],
-          borderColor: 'rgba(255, 255, 255, 0.20)',
-          backgroundColor: 'transparent',
-          tension: 0.45,
-          borderWidth: 1.5,
-          pointRadius: 0,
-          pointHoverRadius: 0
-        },
-        {
-          label: 'Komparasi Baseline 3',
-          data: [0, -20, -82, -60, -13, 0],
-          borderColor: 'rgba(255, 255, 255, 0.14)',
-          backgroundColor: 'transparent',
-          tension: 0.45,
-          borderWidth: 1.5,
-          pointRadius: 0,
-          pointHoverRadius: 0
-        },
-        {
-          label: 'Komparasi Baseline 4',
-          data: [0, -28, -112, -80, -18, 0],
-          borderColor: 'rgba(255, 255, 255, 0.08)',
-          backgroundColor: 'transparent',
-          tension: 0.45,
-          borderWidth: 1.5,
-          pointRadius: 0,
-          pointHoverRadius: 0
+          pointHoverRadius: 0,
+          yAxisID: 'y'
         }
       ]
     },
@@ -232,7 +215,7 @@ function initChart() {
       responsive: true,
       maintainAspectRatio: false,
       animation: {
-        duration: 900,
+        duration: 400,
         easing: 'easeOutQuart'
       },
       interaction: {
@@ -250,16 +233,20 @@ function initChart() {
           borderColor: 'rgba(255, 255, 255, 0.12)',
           borderWidth: 1,
           padding: 10,
-          filter: function(tooltipItem) {
-            // Only show positive datasets in tooltip
-            return tooltipItem.datasetIndex < 5;
-          },
           callbacks: {
             label: function(context) {
               let label = context.dataset.label || '';
               if (label) label += ': ';
               if (context.parsed.y !== null) {
-                label += context.parsed.y + 'k indeks';
+                if (context.datasetIndex === 0 || context.datasetIndex === 1) {
+                  label += context.parsed.y.toFixed(2) + ' mg/L';
+                } else if (context.datasetIndex === 2) {
+                  label += context.parsed.y.toFixed(1) + ' °C';
+                } else if (context.datasetIndex === 3) {
+                  label += context.parsed.y.toFixed(2) + ' pH';
+                } else {
+                  label += context.parsed.y.toFixed(2) + ' Δ delta';
+                }
               }
               return label;
             }
@@ -269,35 +256,58 @@ function initChart() {
       scales: {
         x: {
           grid: {
-            display: false
+            color: 'rgba(255, 255, 255, 0.03)'
           },
           ticks: {
             color: '#85858b',
-            font: { size: 12, family: 'Geist Mono, JetBrains Mono' },
-            padding: 10
+            font: { size: 10, family: 'Geist Mono, JetBrains Mono' },
+            maxRotation: 0,
+            padding: 8
           }
         },
         y: {
-          min: -140,
-          max: 180,
+          type: 'linear',
+          position: 'left',
+          min: -2.0,
+          max: 8.5,
           grid: {
             color: function(context) {
-              if (context.tick.value === 0) {
-                return 'rgba(255, 255, 255, 0.2)';
-              }
+              if (context.tick.value === 5.0) return 'rgba(245, 158, 11, 0.35)'; // Amber line at critical 5.00
+              if (context.tick.value === 0) return 'rgba(255, 255, 255, 0.2)';   // Zero baseline line
               return 'rgba(255, 255, 255, 0.04)';
             },
             lineWidth: function(context) {
-              return context.tick.value === 0 ? 1.2 : 1;
+              return (context.tick.value === 5.0 || context.tick.value === 0) ? 1.5 : 1;
             }
           },
           ticks: {
-            stepSize: 40,
-            color: '#85858b',
-            font: { size: 11, family: 'Geist Mono, JetBrains Mono' },
+            stepSize: 1.5,
+            color: function(context) {
+              if (context.tick.value === 5.0) return '#f59e0b';
+              return '#85858b';
+            },
+            font: { size: 10, family: 'Geist Mono, JetBrains Mono' },
             callback: function(val) {
-              if (val === 0) return '0';
-              return Math.abs(val) + 'k';
+              if (val === 5.0) return '5.00 (Kritis DO)';
+              if (val === 0) return '0.00 (Baseline)';
+              if (val < 0) return '-' + Math.abs(val).toFixed(1) + ' Δ';
+              return val.toFixed(1) + ' mg/L';
+            }
+          }
+        },
+        y1: {
+          type: 'linear',
+          position: 'right',
+          min: 22,
+          max: 36,
+          grid: {
+            drawOnChartArea: false
+          },
+          ticks: {
+            color: '#f43f5e',
+            font: { size: 10, family: 'Geist Mono, JetBrains Mono' },
+            callback: function(val) {
+              return val + ' °C';
             }
           }
         }
@@ -308,26 +318,89 @@ function initChart() {
   const clearBtn = document.getElementById('clearChartBtn');
   if (clearBtn) {
     clearBtn.addEventListener('click', () => {
-      chartInstance.data.datasets[0].data[2] = 160 + Math.round((Math.random() - 0.5) * 10);
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      chartInstance.data.labels = [timeStr];
+      chartInstance.data.datasets[0].data = [state.sensors.do];
+      chartInstance.data.datasets[1].data = [5.00];
+      chartInstance.data.datasets[2].data = [state.sensors.temp];
+      chartInstance.data.datasets[3].data = [state.sensors.ph];
+      chartInstance.data.datasets[4].data = [-0.5];
       chartInstance.update();
-      showToast('Data telemetri disinkronkan.', 'info');
+      showToast('Riwayat telemetri di-reset ke waktu saat ini.', 'info');
     });
   }
 }
 
-// Update grafik dengan data terbaru
+// Update grafik dengan data terbaru (Live Streaming)
 function pushDataToChart(doVal, tempVal) {
   if (!chartInstance) return;
 
   const now = new Date();
   const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
-  // Update apex value dynamically based on live DO
-  const normalizedDO = Math.round((doVal / 5.4) * 160);
-  chartInstance.data.datasets[0].data[2] = normalizedDO;
-  chartInstance.update();
+  // 1. Shift timestamps forward
+  chartInstance.data.labels.push(timeStr);
+  if (chartInstance.data.labels.length > 14) {
+    chartInstance.data.labels.shift();
+  }
 
+  // 2. Push real sensor readings
+  const phVal = state.sensors.ph;
+  const deltaMirror = -(Math.abs(doVal - 5.40) * 1.4 + 0.4);
+
+  // Dataset 0: DO
+  chartInstance.data.datasets[0].data.push(doVal);
+  if (chartInstance.data.datasets[0].data.length > 14) chartInstance.data.datasets[0].data.shift();
+
+  // Dataset 1: Critical Threshold 5.00
+  chartInstance.data.datasets[1].data.push(5.00);
+  if (chartInstance.data.datasets[1].data.length > 14) chartInstance.data.datasets[1].data.shift();
+
+  // Dataset 2: Suhu Air
+  chartInstance.data.datasets[2].data.push(tempVal);
+  if (chartInstance.data.datasets[2].data.length > 14) chartInstance.data.datasets[2].data.shift();
+
+  // Dataset 3: pH Air
+  chartInstance.data.datasets[3].data.push(phVal);
+  if (chartInstance.data.datasets[3].data.length > 14) chartInstance.data.datasets[3].data.shift();
+
+  // Dataset 4: Mirrored Comparison
+  chartInstance.data.datasets[4].data.push(deltaMirror);
+  if (chartInstance.data.datasets[4].data.length > 14) chartInstance.data.datasets[4].data.shift();
+
+  // Dynamic alert color if DO is under 5.0
+  if (doVal < 5.00) {
+    chartInstance.data.datasets[0].borderColor = '#e5484d';
+    chartInstance.data.datasets[0].backgroundColor = 'rgba(229, 72, 77, 0.15)';
+  } else {
+    chartInstance.data.datasets[0].borderColor = '#0aa094';
+    chartInstance.data.datasets[0].backgroundColor = 'rgba(10, 160, 148, 0.08)';
+  }
+
+  chartInstance.update('none');
+
+  // 3. Update Chart Header Metrik
+  const heroMetric = document.getElementById('chartHeroMetric');
+  const heroTrend = document.getElementById('chartHeroTrend');
   const updateEl = document.getElementById('chartLastUpdated');
+
+  if (heroMetric) {
+    heroMetric.innerHTML = `${doVal.toFixed(2)} <span class="text-base text-neutral-400 font-sans">mg/L</span>`;
+  }
+
+  if (heroTrend) {
+    if (doVal < 5.00) {
+      const diff = (5.00 - doVal).toFixed(2);
+      heroTrend.className = 'text-xs text-red-400 font-mono mt-1 font-semibold';
+      heroTrend.innerText = `Peringatan Anoksia: ${diff} mg/L di bawah batas kritis (5.00 mg/L)!`;
+    } else {
+      const diff = (doVal - 5.00).toFixed(2);
+      heroTrend.className = 'text-xs text-emerald-400 font-mono mt-1';
+      heroTrend.innerText = `+${diff} mg/L di atas batas kritis (5.00 mg/L) • Aerasi Efisien`;
+    }
+  }
+
   if (updateEl) updateEl.innerText = `Diperbarui: ${timeStr} WIB`;
 }
 
@@ -761,7 +834,7 @@ function toggleNetworkConnection(forceOnline = false) {
   }
 }
 
-// --- Data Stream Otomatis (Interval 5 Detik) ---
+// --- Data Stream Otomatis (Interval 3 Detik) ---
 function startAutoStream() {
   streamInterval = setInterval(() => {
     if (!state.autoStream) return;
@@ -789,7 +862,7 @@ function startAutoStream() {
       if (bufEl) bufEl.innerText = state.offlineBuffer;
       logTerminal(`[SPIFFS CACHE] Menyimpan record #${state.offlineBuffer} di memori lokal ESP32...`, 'text-amber-700');
     }
-  }, 5000);
+  }, 3000);
 }
 
 // --- Terminal Logger ---
