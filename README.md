@@ -1,8 +1,15 @@
-# Smart Aquaculture IoT - Interactive Prototype & Simulator
-**ZeroBug Team &bull; SMKS Perikanan dan Kelautan Puger**
+# 🐟 WIRU: Water Intelligence for Raising Underwater life
 
-Aplikasi web interaktif ini dibuat sebagai ilustrasi dan representasi langsung dari proposal:
-`Proposal_IoT_SMK-Perikanan_Puger_ZeroBugTeam.pdf` (*Perikanan Cerdas Berbasis Internet of Things*).
+> **Prototipe Interaktif & Simulator Sistem Akuakultur Pintar Berbasis Internet of Things**  
+> Representasi digital sistem *"Perikanan Cerdas Berbasis IoT"* untuk **SMKS Perikanan dan Kelautan Puger**.
+
+<div align="center">
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Platform](https://img.shields.io/badge/Platform-Web%20%26%20IoT-blue.svg)](#)
+[![Education](https://img.shields.io/badge/Target-Edukasi%20Vokasi-orange.svg)](#)
+
+</div>
 
 ---
 

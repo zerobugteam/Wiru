@@ -1,6 +1,6 @@
 /**
- * Smart Aquaculture IoT System - Prototype & Simulator
- * ZeroBug Team x SMKS Perikanan dan Kelautan Puger
+ * WIRU - Water Intelligence for Raising Underwater life
+ * SMKS Perikanan dan Kelautan Puger
  */
 
 // --- Global State ---
@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
   applyRolePermissions();
   startAutoStream();
 
-  console.log("ZeroBug Aquaculture IoT Simulator Ready.");
+  console.log("WIRU (Water Intelligence for Raising Underwater life) Simulator Ready.");
 });
 
 function initLucide() {
@@ -312,7 +312,7 @@ function initControls() {
 
   // Test WA
   document.getElementById('btnSendTestWA').addEventListener('click', () => {
-    sendMockWhatsAppAlert("🧪 Uji Coba Notifikasi Gateway ZeroBug IoT: Sistem Beroperasi Normal.");
+    sendMockWhatsAppAlert("Uji Coba WIRU Gateway: Sistem Beroperasi Normal.");
     showToast("Pesan uji coba dikirim ke chat preview", "success");
   });
 }
@@ -457,7 +457,7 @@ function evaluateSystemRules() {
     hasCriticalIssue = true;
     if (!state.actuators.aerator) {
       setAeratorState(true, 'Otomatis (DO Kritis < 5.0 mg/L)');
-      sendMockWhatsAppAlert(`⚠️ DARURAT OKSIGEN! Kadar DO ${state.currentPond} turun menjadi ${doVal.toFixed(1)} mg/L (Batas aman: 5.0 mg/L). Aerator diaktifkan otomatis.`);
+      sendMockWhatsAppAlert(`DARURAT OKSIGEN! Kadar DO ${state.currentPond} turun menjadi ${doVal.toFixed(1)} mg/L (Batas aman: 5.0 mg/L). Aerator diaktifkan otomatis.`);
       showToast(`Peringatan: Oksigen Rendah (${doVal.toFixed(1)} mg/L)! Aerator dihidupkan.`, 'danger');
     }
     alertBanner.className = 'rounded-xl border border-red-500/50 bg-red-950/40 p-4 transition-all duration-300 flex items-start gap-4';
@@ -468,7 +468,7 @@ function evaluateSystemRules() {
   // Rule 2: DO >= 5.4 mg/L -> Hysteresis: Matikan aerator otomatis jika sebelumnya aktif karena otomasi
   else if (doVal >= 5.4 && state.actuators.aerator) {
     setAeratorState(false, 'Otomatis (Kondisi DO Stabil & Hemat Energi)');
-    sendMockWhatsAppAlert(`✅ INFO STABIL: Kadar oksigen ${state.currentPond} kembali aman (${doVal.toFixed(1)} mg/L). Aerator dimatikan otomatis.`);
+    sendMockWhatsAppAlert(`INFO STABIL: Kadar oksigen ${state.currentPond} kembali aman (${doVal.toFixed(1)} mg/L). Aerator dimatikan otomatis.`);
     showToast(`Oksigen kembali stabil (${doVal.toFixed(1)} mg/L). Aerator dimatikan.`, 'success');
     alertBanner.classList.add('hidden');
   } else if (!hasCriticalIssue) {
@@ -635,7 +635,7 @@ function startAutoStream() {
       state.packetCount++;
       document.getElementById('packetCount').innerText = state.packetCount;
 
-      logTerminal(`[MQTT PUSH] topic: "zerobug/puger/kolamA/telemetry" payload: {"do":${state.sensors.do},"temp":${state.sensors.temp},"ph":${state.sensors.ph}}`, 'text-slate-500');
+      logTerminal(`[MQTT PUSH] topic: "wiru/kolamA/telemetry" payload: {"do":${state.sensors.do},"temp":${state.sensors.temp},"ph":${state.sensors.ph}}`, 'text-slate-500');
     } else {
       // Mode offline: bertambah di buffer
       state.offlineBuffer++;

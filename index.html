@@ -1,77 +1,75 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="overflow-x-clip">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Smart Aquaculture IoT Dashboard | ZeroBug & SMKS Perikanan Puger</title>
+  <meta name="description" content="Sistem monitoring dan otomatisasi kolam tambak perikanan cerdas berbasis IoT untuk SMKS Perikanan dan Kelautan Puger.">
+  <title>WIRU | Water Intelligence for Raising Underwater life</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- Google Fonts: Inter -->
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen font-sans antialiased flex flex-col">
+<body class="min-h-screen flex flex-col overflow-x-clip">
 
   <!-- TOP NAVIGATION HEADER -->
-  <header class="bg-slate-900/95 backdrop-blur border-b border-slate-800 sticky top-0 z-40 px-4 lg:px-8 py-3">
+  <header class="border-b border-stone-800 bg-stone-950/90 backdrop-blur sticky top-0 z-40 px-4 lg:px-8 py-3">
     <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
       
-      <!-- Logo & Project Identity -->
+      <!-- Project Identity -->
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 to-emerald-500 flex items-center justify-center shadow-lg shadow-cyan-500/20 text-white font-bold text-xl">
-          <i data-lucide="waves" class="w-6 h-6"></i>
+        <div class="w-9 h-9 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold text-sm">
+          W
         </div>
         <div>
           <div class="flex items-center gap-2">
-            <h1 class="text-lg font-bold text-white tracking-tight">Smart Aquaculture IoT</h1>
-            <span class="px-2 py-0.5 text-xs rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium">Prototype v1.0</span>
+            <h1 class="text-base font-semibold text-stone-100 tracking-wide">WIRU</h1>
+            <span class="px-2 py-0.5 text-[11px] rounded bg-stone-800 text-stone-300 font-medium border border-stone-700">Prototype v1.0</span>
           </div>
-          <p class="text-xs text-slate-400">ZeroBugTeam &bull; SMKS Perikanan dan Kelautan Puger</p>
+          <p class="text-[11px] text-stone-400">Water Intelligence for Raising Underwater life</p>
         </div>
       </div>
 
-      <!-- Live Status & Quick Controls -->
-      <div class="flex items-center flex-wrap gap-3">
-        <!-- Connection Status Indicator -->
-        <div id="connectionStatusBadge" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-950/40 border border-emerald-500/30 text-emerald-400 text-xs font-medium">
-          <span class="relative flex h-2.5 w-2.5">
+      <!-- Status & Role Switcher -->
+      <div class="flex items-center flex-wrap gap-2.5">
+        <!-- Connection Status -->
+        <div id="connectionStatusBadge" class="flex items-center gap-2 px-3 py-1.5 rounded-md bg-stone-900 border border-stone-700 text-emerald-400 text-xs">
+          <span class="relative flex h-2 w-2">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
           </span>
           <span id="connectionStatusText">ESP32: Online (Wi-Fi)</span>
         </div>
 
         <!-- Kolam Selector -->
-        <div class="flex items-center gap-2 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700 text-xs">
-          <i data-lucide="map-pin" class="w-3.5 h-3.5 text-cyan-400"></i>
-          <span class="text-slate-400">Lokasi:</span>
-          <select id="pondSelector" class="bg-transparent font-semibold text-white focus:outline-none cursor-pointer">
-            <option value="Kolam A" class="bg-slate-800">Kolam A (Tambak Vaname)</option>
-            <option value="Kolam B" class="bg-slate-800">Kolam B (Tambak Nila Salin)</option>
-            <option value="Kolam C" class="bg-slate-800">Kolam C (Nursery / Benih)</option>
+        <div class="flex items-center gap-1.5 bg-stone-900 px-3 py-1.5 rounded-md border border-stone-700 text-xs">
+          <span class="text-stone-400">Lokasi:</span>
+          <select id="pondSelector" class="bg-transparent font-medium text-stone-200 focus:outline-none cursor-pointer">
+            <option value="Kolam A" class="bg-stone-900">Kolam A (Tambak Vaname)</option>
+            <option value="Kolam B" class="bg-stone-900">Kolam B (Tambak Nila Salin)</option>
+            <option value="Kolam C" class="bg-stone-900">Kolam C (Nursery / Benih)</option>
           </select>
         </div>
 
-        <!-- Role Switcher (Admin / Guru / Siswa) -->
-        <div class="flex items-center gap-2 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700 text-xs">
-          <i data-lucide="shield" class="w-3.5 h-3.5 text-amber-400"></i>
-          <span class="text-slate-400">Peran:</span>
-          <select id="userRoleSelector" class="bg-transparent font-semibold text-amber-300 focus:outline-none cursor-pointer">
-            <option value="admin" class="bg-slate-800">Admin (Akses Penuh)</option>
-            <option value="guru" selected class="bg-slate-800">Guru / Teknisi</option>
-            <option value="siswa" class="bg-slate-800">Siswa (Read-Only / Praktik)</option>
+        <!-- Role Switcher -->
+        <div class="flex items-center gap-1.5 bg-stone-900 px-3 py-1.5 rounded-md border border-stone-700 text-xs">
+          <span class="text-stone-400">Peran:</span>
+          <select id="userRoleSelector" class="bg-transparent font-medium text-amber-300 focus:outline-none cursor-pointer">
+            <option value="admin" class="bg-stone-900">Admin (Akses Penuh)</option>
+            <option value="guru" selected class="bg-stone-900">Guru / Teknisi</option>
+            <option value="siswa" class="bg-stone-900">Siswa (Read-Only / Praktik)</option>
           </select>
         </div>
 
-        <!-- Live Clock -->
-        <div class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800/50 border border-slate-700/50 text-slate-300 text-xs font-mono">
-          <i data-lucide="clock" class="w-3.5 h-3.5 text-slate-400"></i>
+        <!-- Clock -->
+        <div class="hidden sm:flex items-center px-3 py-1.5 rounded-md bg-stone-900 border border-stone-800 text-stone-400 text-xs font-mono">
           <span id="liveClock">--:--:--</span>
         </div>
       </div>
@@ -80,28 +78,23 @@
   </header>
 
   <!-- NAVIGATION TABS -->
-  <div class="bg-slate-900 border-b border-slate-800">
+  <div class="border-b border-stone-800 bg-stone-950">
     <div class="max-w-7xl mx-auto px-4 lg:px-8">
-      <nav class="flex space-x-1 sm:space-x-4 overflow-x-auto py-2 scrollbar-none" id="mainTabs">
+      <nav class="flex space-x-2 overflow-x-auto py-2" id="mainTabs">
         <button class="nav-tab active" data-tab="tab-dashboard">
-          <i data-lucide="layout-dashboard" class="w-4 h-4 mr-2"></i>
           Dashboard Monitoring
         </button>
         <button class="nav-tab" data-tab="tab-simulator">
-          <i data-lucide="sliders" class="w-4 h-4 mr-2"></i>
-          Simulator Sensor & Alur IoT
+          Simulator Sensor &amp; Alur IoT
         </button>
         <button class="nav-tab" data-tab="tab-architecture">
-          <i data-lucide="network" class="w-4 h-4 mr-2"></i>
           Diagram 4 Lapisan Sistem
         </button>
         <button class="nav-tab" data-tab="tab-logs">
-          <i data-lucide="history" class="w-4 h-4 mr-2"></i>
-          Log Riwayat & Notifikasi
+          Log Riwayat &amp; Notifikasi
         </button>
         <button class="nav-tab" data-tab="tab-trainer">
-          <i data-lucide="graduation-cap" class="w-4 h-4 mr-2"></i>
-          Trainer Kit Siswa (Edukasi)
+          Trainer Kit Siswa
         </button>
       </nav>
     </div>
@@ -110,174 +103,167 @@
   <!-- MAIN CONTENT CONTAINER -->
   <main class="max-w-7xl mx-auto w-full px-4 lg:px-8 py-6 flex-1">
 
-    <!-- ========================================================================= -->
-    <!-- TAB 1: DASHBOARD MONITORING UTAMA (Gambar 4 Proposal)                      -->
-    <!-- ========================================================================= -->
+    <!-- TAB 1: DASHBOARD MONITORING UTAMA -->
     <div id="tab-dashboard" class="tab-content space-y-6">
 
-      <!-- ALERT BANNER (Dinamis jika kondisi abnormal) -->
-      <div id="dynamicAlertBanner" class="hidden rounded-xl border p-4 transition-all duration-300 flex items-start gap-4">
-        <div id="alertIconContainer" class="p-2 rounded-lg bg-red-500/20 text-red-400 shrink-0">
-          <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+      <!-- ALERT BANNER -->
+      <div id="dynamicAlertBanner" class="hidden rounded-lg border p-4 transition-colors flex items-start gap-3.5">
+        <div id="alertIconContainer" class="p-1.5 rounded bg-red-500/10 text-red-400 shrink-0 mt-0.5">
+          <i data-lucide="alert-triangle" class="w-5 h-5"></i>
         </div>
         <div class="flex-1">
-          <h3 id="alertTitle" class="text-sm font-bold text-red-300 uppercase tracking-wide">PERINGATAN: KUALITAS AIR DILUAR BATAS AMAN</h3>
-          <p id="alertDescription" class="text-sm text-slate-300 mt-1">
+          <div id="alertTitle" class="text-sm font-semibold text-red-300">Peringatan: Kualitas air di luar batas aman</div>
+          <p id="alertDescription" class="text-xs text-stone-300 mt-1 leading-relaxed">
             Kadar oksigen kolam di bawah batas aman. Aerator otomatis dinyalakan dan notifikasi telah dikirim via WhatsApp.
           </p>
         </div>
-        <button id="dismissAlertBtn" class="text-xs px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition">
+        <button id="dismissAlertBtn" class="text-xs px-2.5 py-1 rounded bg-stone-800 hover:bg-stone-700 text-stone-300 transition-colors">
           Tutup
         </button>
       </div>
 
-      <!-- SENSOR CARDS GRID (Suhu, pH, Salinitas, DO, Kekeruhan) -->
-      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <!-- SENSOR CARDS GRID -->
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3.5">
 
         <!-- Card: Suhu Air -->
         <div class="metric-card" id="card-temp">
-          <div class="flex items-center justify-between text-slate-400 mb-2">
-            <span class="text-xs uppercase font-semibold tracking-wider">Suhu Air</span>
+          <div class="flex items-center justify-between text-stone-400 mb-1.5">
+            <span class="text-xs font-medium">Suhu air</span>
             <i data-lucide="thermometer" class="w-4 h-4 text-rose-400"></i>
           </div>
           <div class="flex items-baseline gap-1">
-            <span id="val-temp" class="text-3xl font-bold font-mono text-white">28.5</span>
-            <span class="text-sm text-slate-400 font-medium">°C</span>
+            <span id="val-temp" class="text-2xl font-bold font-mono text-stone-100">28.5</span>
+            <span class="text-xs text-stone-400">°C</span>
           </div>
-          <div class="mt-3 flex items-center justify-between">
+          <div class="mt-2.5 flex items-center justify-between">
             <span id="badge-temp" class="status-badge bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Normal</span>
-            <span class="text-[11px] text-slate-400">Target: 26 - 31°C</span>
+            <span class="text-[11px] text-stone-400">Target: 26 - 31°C</span>
           </div>
         </div>
 
         <!-- Card: pH Air -->
         <div class="metric-card" id="card-ph">
-          <div class="flex items-center justify-between text-slate-400 mb-2">
-            <span class="text-xs uppercase font-semibold tracking-wider">pH Air</span>
+          <div class="flex items-center justify-between text-stone-400 mb-1.5">
+            <span class="text-xs font-medium">pH air</span>
             <i data-lucide="droplet" class="w-4 h-4 text-sky-400"></i>
           </div>
           <div class="flex items-baseline gap-1">
-            <span id="val-ph" class="text-3xl font-bold font-mono text-white">7.4</span>
-            <span class="text-sm text-slate-400 font-medium">pH</span>
+            <span id="val-ph" class="text-2xl font-bold font-mono text-stone-100">7.4</span>
+            <span class="text-xs text-stone-400">pH</span>
           </div>
-          <div class="mt-3 flex items-center justify-between">
+          <div class="mt-2.5 flex items-center justify-between">
             <span id="badge-ph" class="status-badge bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Normal</span>
-            <span class="text-[11px] text-slate-400">Target: 7.0 - 8.5</span>
+            <span class="text-[11px] text-stone-400">Target: 7.0 - 8.5</span>
           </div>
         </div>
 
         <!-- Card: Salinitas -->
         <div class="metric-card" id="card-salinity">
-          <div class="flex items-center justify-between text-slate-400 mb-2">
-            <span class="text-xs uppercase font-semibold tracking-wider">Salinitas</span>
+          <div class="flex items-center justify-between text-stone-400 mb-1.5">
+            <span class="text-xs font-medium">Salinitas</span>
             <i data-lucide="sparkles" class="w-4 h-4 text-indigo-400"></i>
           </div>
           <div class="flex items-baseline gap-1">
-            <span id="val-salinity" class="text-3xl font-bold font-mono text-white">18</span>
-            <span class="text-sm text-slate-400 font-medium">ppt</span>
+            <span id="val-salinity" class="text-2xl font-bold font-mono text-stone-100">18</span>
+            <span class="text-xs text-stone-400">ppt</span>
           </div>
-          <div class="mt-3 flex items-center justify-between">
+          <div class="mt-2.5 flex items-center justify-between">
             <span id="badge-salinity" class="status-badge bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Normal</span>
-            <span class="text-[11px] text-slate-400">Target: 15 - 25 ppt</span>
+            <span class="text-[11px] text-stone-400">Target: 15 - 25 ppt</span>
           </div>
         </div>
 
         <!-- Card: Oksigen Terlarut (DO) -->
-        <div class="metric-card border-cyan-500/40 relative overflow-hidden" id="card-do">
-          <div class="flex items-center justify-between text-slate-400 mb-2">
-            <span class="text-xs uppercase font-semibold tracking-wider">Oksigen (DO)</span>
+        <div class="metric-card" id="card-do">
+          <div class="flex items-center justify-between text-stone-400 mb-1.5">
+            <span class="text-xs font-medium">Oksigen terlarut (DO)</span>
             <i data-lucide="wind" class="w-4 h-4 text-cyan-400"></i>
           </div>
           <div class="flex items-baseline gap-1">
-            <span id="val-do" class="text-3xl font-bold font-mono text-white">5.4</span>
-            <span class="text-sm text-slate-400 font-medium">mg/L</span>
+            <span id="val-do" class="text-2xl font-bold font-mono text-stone-100">5.4</span>
+            <span class="text-xs text-stone-400">mg/L</span>
           </div>
-          <div class="mt-3 flex items-center justify-between">
+          <div class="mt-2.5 flex items-center justify-between">
             <span id="badge-do" class="status-badge bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Normal</span>
-            <span class="text-[11px] text-slate-400">Min: 5.0 mg/L</span>
+            <span class="text-[11px] text-stone-400">Min: 5.0 mg/L</span>
           </div>
         </div>
 
-        <!-- Card: Kekeruhan (Turbidity) -->
+        <!-- Card: Kekeruhan -->
         <div class="metric-card" id="card-turbidity">
-          <div class="flex items-center justify-between text-slate-400 mb-2">
-            <span class="text-xs uppercase font-semibold tracking-wider">Kekeruhan</span>
+          <div class="flex items-center justify-between text-stone-400 mb-1.5">
+            <span class="text-xs font-medium">Kekeruhan</span>
             <i data-lucide="eye" class="w-4 h-4 text-amber-400"></i>
           </div>
           <div class="flex items-baseline gap-1">
-            <span id="val-turbidity" class="text-3xl font-bold font-mono text-white">32</span>
-            <span class="text-sm text-slate-400 font-medium">NTU</span>
+            <span id="val-turbidity" class="text-2xl font-bold font-mono text-stone-100">32</span>
+            <span class="text-xs text-stone-400">NTU</span>
           </div>
-          <div class="mt-3 flex items-center justify-between">
+          <div class="mt-2.5 flex items-center justify-between">
             <span id="badge-turbidity" class="status-badge bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Normal</span>
-            <span class="text-[11px] text-slate-400">Batas: &lt; 50 NTU</span>
+            <span class="text-[11px] text-stone-400">Batas: &lt; 50 NTU</span>
           </div>
         </div>
 
       </div>
 
-      <!-- MAIN CHART & DEVICE CONTROL SECTION -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- MAIN CHART & DEVICE CONTROL -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
-        <!-- Chart Section (2 Cols on lg) -->
-        <div class="lg:col-span-2 bg-slate-800/60 border border-slate-700/70 rounded-2xl p-5 shadow-xl flex flex-col">
-          <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-            <div>
-              <h2 class="text-base font-bold text-white flex items-center gap-2">
-                <i data-lucide="line-chart" class="w-4 h-4 text-cyan-400"></i>
-                Grafik Oksigen Terlarut (DO) & Suhu Air
-              </h2>
-              <p class="text-xs text-slate-400">Riwayat berkala dari modul ESP32 dengan batas kritis 5.0 mg/L</p>
+        <!-- Chart -->
+        <div class="lg:col-span-2 metric-card flex flex-col justify-between">
+          <div>
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+              <div>
+                <h2 class="text-sm font-semibold text-stone-100">Grafik Oksigen Terlarut (DO) dan Suhu Air</h2>
+                <p class="text-xs text-stone-400">Riwayat telemetri ESP32 dengan batas kritis 5.0 mg/L</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-[11px] px-2 py-0.5 rounded bg-stone-800 text-stone-300 font-mono">Interval 5s</span>
+                <button id="clearChartBtn" class="text-xs px-2.5 py-1 rounded bg-stone-800 hover:bg-stone-700 text-stone-300 transition-colors">
+                  Reset
+                </button>
+              </div>
             </div>
-            
-            <div class="flex items-center gap-2">
-              <span class="text-xs px-2.5 py-1 rounded-md bg-slate-700 text-slate-300 font-mono">Interval: 5s (Demo)</span>
-              <button id="clearChartBtn" class="text-xs px-2.5 py-1 rounded-md bg-slate-700 hover:bg-slate-600 text-slate-300 transition">
-                Reset Riwayat
-              </button>
+
+            <!-- Canvas with aria-label -->
+            <div class="relative w-full h-72">
+              <canvas id="aquacultureChart" aria-label="Grafik Oksigen Terlarut dan Suhu Kolam"></canvas>
             </div>
           </div>
 
-          <!-- Chart Canvas Container -->
-          <div class="relative w-full h-72">
-            <canvas id="aquacultureChart"></canvas>
-          </div>
-          
-          <div class="mt-3 pt-3 border-t border-slate-700/60 flex items-center justify-between text-xs text-slate-400">
+          <div class="mt-3 pt-3 border-t border-stone-800 flex items-center justify-between text-xs text-stone-400">
             <div class="flex items-center gap-4">
               <span class="flex items-center gap-1.5"><span class="w-3 h-0.5 bg-cyan-400 rounded"></span> Oksigen (DO)</span>
               <span class="flex items-center gap-1.5"><span class="w-3 h-0.5 bg-rose-400 rounded"></span> Suhu (°C)</span>
-              <span class="flex items-center gap-1.5"><span class="w-3 h-0.5 border-t border-dashed border-red-400"></span> Ambang Batas 5.0 mg/L</span>
+              <span class="flex items-center gap-1.5"><span class="w-3 h-0.5 border-t border-dashed border-red-400"></span> Batas 5.0 mg/L</span>
             </div>
             <span id="chartLastUpdated" class="italic">Diperbarui: baru saja</span>
           </div>
         </div>
 
-        <!-- Kendali Perangkat & Aktuator (1 Col on lg) -->
-        <div class="bg-slate-800/60 border border-slate-700/70 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
+        <!-- Controls -->
+        <div class="metric-card flex flex-col justify-between">
           <div>
-            <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-700/60">
+            <div class="flex items-center justify-between mb-4 pb-2 border-b border-stone-800">
               <div>
-                <h2 class="text-base font-bold text-white flex items-center gap-2">
-                  <i data-lucide="toggle-left" class="w-4 h-4 text-emerald-400"></i>
-                  Kendali Perangkat Kolam
-                </h2>
-                <p class="text-xs text-slate-400">Relay aktuator otomatis / manual</p>
+                <h2 class="text-sm font-semibold text-stone-100">Kendali Perangkat Kolam</h2>
+                <p class="text-xs text-stone-400">Relay aktuator otomatis / manual</p>
               </div>
-              <span id="roleBadgeControl" class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+              <span id="roleBadgeControl" class="text-xs font-medium px-2 py-0.5 rounded bg-stone-800 text-amber-300 border border-stone-700">
                 Guru / Teknisi
               </span>
             </div>
 
-            <!-- Switch 1: Aerator / Kincir Air -->
-            <div class="control-box flex items-center justify-between p-3.5 rounded-xl bg-slate-900/60 border border-slate-700/60 mb-3">
-              <div class="flex items-center gap-3">
-                <div id="iconAeratorBg" class="w-9 h-9 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400 transition-colors">
-                  <i data-lucide="fan" id="iconAerator" class="w-5 h-5"></i>
+            <!-- Switch 1: Aerator -->
+            <div class="flex items-center justify-between p-3 rounded-lg bg-stone-900 border border-stone-800 mb-2.5">
+              <div class="flex items-center gap-2.5">
+                <div id="iconAeratorBg" class="w-8 h-8 rounded bg-stone-800 flex items-center justify-center text-stone-400 transition-colors">
+                  <i data-lucide="fan" id="iconAerator" class="w-4 h-4"></i>
                 </div>
                 <div>
-                  <h4 class="text-sm font-semibold text-white">Aerator / Kincir</h4>
-                  <p id="subAeratorStatus" class="text-xs text-slate-400">Otomatisasi: Aktif saat DO &lt; 5.0</p>
+                  <div class="text-xs font-semibold text-stone-200">Aerator / Kincir</div>
+                  <div id="subAeratorStatus" class="text-[11px] text-stone-400">Aktif saat DO &lt; 5.0</div>
                 </div>
               </div>
               <label class="switch-toggle">
@@ -286,15 +272,15 @@
               </label>
             </div>
 
-            <!-- Switch 2: Pompa Penggantian Air -->
-            <div class="control-box flex items-center justify-between p-3.5 rounded-xl bg-slate-900/60 border border-slate-700/60 mb-3">
-              <div class="flex items-center gap-3">
-                <div id="iconPumpBg" class="w-9 h-9 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400 transition-colors">
-                  <i data-lucide="refresh-cw" id="iconPump" class="w-5 h-5"></i>
+            <!-- Switch 2: Pompa -->
+            <div class="flex items-center justify-between p-3 rounded-lg bg-stone-900 border border-stone-800 mb-2.5">
+              <div class="flex items-center gap-2.5">
+                <div id="iconPumpBg" class="w-8 h-8 rounded bg-stone-800 flex items-center justify-center text-stone-400 transition-colors">
+                  <i data-lucide="refresh-cw" id="iconPump" class="w-4 h-4"></i>
                 </div>
                 <div>
-                  <h4 class="text-sm font-semibold text-white">Pompa Sirkulasi</h4>
-                  <p class="text-xs text-slate-400">Sirkulasi & pergantian air kolam</p>
+                  <div class="text-xs font-semibold text-stone-200">Pompa Sirkulasi</div>
+                  <div class="text-[11px] text-stone-400">Sirkulasi pergantian air</div>
                 </div>
               </div>
               <label class="switch-toggle">
@@ -303,15 +289,15 @@
               </label>
             </div>
 
-            <!-- Switch 3: Pakan Ikan Otomatis (Auto Feeder) -->
-            <div class="control-box flex items-center justify-between p-3.5 rounded-xl bg-slate-900/60 border border-slate-700/60 mb-4">
-              <div class="flex items-center gap-3">
-                <div id="iconFeederBg" class="w-9 h-9 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400 transition-colors">
-                  <i data-lucide="utensils" id="iconFeeder" class="w-5 h-5"></i>
+            <!-- Switch 3: Feeder -->
+            <div class="flex items-center justify-between p-3 rounded-lg bg-stone-900 border border-stone-800 mb-3">
+              <div class="flex items-center gap-2.5">
+                <div id="iconFeederBg" class="w-8 h-8 rounded bg-stone-800 flex items-center justify-center text-stone-400 transition-colors">
+                  <i data-lucide="utensils" id="iconFeeder" class="w-4 h-4"></i>
                 </div>
                 <div>
-                  <h4 class="text-sm font-semibold text-white">Pakan Otomatis</h4>
-                  <p class="text-xs text-slate-400">Jadwal: 07:00, 11:30, 16:00 WIB</p>
+                  <div class="text-xs font-semibold text-stone-200">Pakan Otomatis</div>
+                  <div class="text-[11px] text-stone-400">Jadwal: 07:00, 11:30, 16:00</div>
                 </div>
               </div>
               <label class="switch-toggle">
@@ -320,23 +306,19 @@
               </label>
             </div>
 
-            <!-- Manual Feed Now Button -->
-            <button id="btnFeedNow" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 font-semibold text-sm text-white flex items-center justify-center gap-2 shadow-lg shadow-emerald-700/20 active:scale-[0.98] transition">
-              <i data-lucide="send" class="w-4 h-4"></i>
-              Beri Pakan Sekarang (Dispense 250g)
+            <!-- Feed Now Button -->
+            <button id="btnFeedNow" class="w-full py-2 px-3 rounded-md bg-stone-800 hover:bg-stone-700 border border-stone-700 text-stone-200 font-medium text-xs flex items-center justify-center gap-2 transition-colors whitespace-nowrap">
+              <i data-lucide="send" class="w-3.5 h-3.5 text-amber-400"></i>
+              Beri Pakan Sekarang (250g)
             </button>
           </div>
 
-          <!-- Notification Feed Snapshot -->
-          <div class="mt-4 pt-4 border-t border-slate-700/60">
-            <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
-              <span class="font-medium">Gateway Notifikasi Cepat</span>
-              <span class="text-emerald-400 flex items-center gap-1">
-                <i data-lucide="check-circle" class="w-3 h-3"></i> WA & Telegram Siap
-              </span>
+          <div class="mt-4 pt-3 border-t border-stone-800">
+            <div class="flex items-center justify-between text-xs text-stone-400 mb-1.5">
+              <span>Status Notifikasi</span>
+              <span class="text-emerald-400 text-[11px]">WA &amp; Telegram Siap</span>
             </div>
-            <div id="recentNotificationPreview" class="text-xs p-2.5 rounded-lg bg-slate-900/80 border border-slate-700/50 text-slate-300 font-mono flex items-center gap-2 truncate">
-              <i data-lucide="message-square" class="w-3.5 h-3.5 text-cyan-400 shrink-0"></i>
+            <div id="recentNotificationPreview" class="text-xs p-2 rounded bg-stone-900 border border-stone-800 text-stone-300 font-mono truncate">
               <span id="previewNotifText">Siap mengirim peringatan ke Guru Pembimbing</span>
             </div>
           </div>
@@ -346,105 +328,95 @@
 
     </div>
 
-    <!-- ========================================================================= -->
-    <!-- TAB 2: SIMULATOR SENSOR & ALUR IOT (Uji Skenario Proposal Halaman 3-4)      -->
-    <!-- ========================================================================= -->
+    <!-- TAB 2: SIMULATOR SENSOR & ALUR IOT -->
     <div id="tab-simulator" class="tab-content hidden space-y-6">
 
-      <div class="bg-gradient-to-r from-cyan-950/40 via-slate-800/60 to-emerald-950/40 border border-cyan-500/30 rounded-2xl p-6 shadow-xl">
-        <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+      <div class="metric-card space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 uppercase">
-              Interactive Test Lab
-            </span>
-            <h2 class="text-xl font-bold text-white mt-1">Simulator Lapangan & ESP32 Virtual</h2>
-            <p class="text-sm text-slate-300">
-              Gunakan kontrol di bawah ini untuk memicu skenario ekstrem (seperti penurunan kadar oksigen) dan lihat reaksi otomatisasi aerator serta notifikasi secara langsung.
+            <h2 class="text-base font-semibold text-stone-100">Simulator Lapangan dan ESP32 Virtual</h2>
+            <p class="text-xs text-stone-400">
+              Picu skenario anomali atau geser slider parameter untuk menguji alur otomasi dan peringatan.
             </p>
           </div>
-          
-          <!-- Simulation Mode Toggle -->
-          <div class="flex items-center gap-3 bg-slate-900/90 p-2 rounded-xl border border-slate-700">
-            <span class="text-xs text-slate-400 font-medium">Auto-Random Stream:</span>
-            <button id="btnToggleRandomStream" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white transition flex items-center gap-1.5">
-              <i data-lucide="play" class="w-3.5 h-3.5"></i> Berjalan
+          <div class="flex items-center gap-2 bg-stone-900 p-1.5 rounded border border-stone-800">
+            <span class="text-xs text-stone-400">Data Stream:</span>
+            <button id="btnToggleRandomStream" class="px-2.5 py-1 rounded bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-medium transition-colors">
+              Berjalan
             </button>
           </div>
         </div>
 
-        <!-- Tombol Skenario Cepat (Sesuai Proposal Bab 5 & 6) -->
-        <div class="pt-3 border-t border-slate-700/60">
-          <label class="text-xs font-semibold text-slate-300 block mb-2">Pilih Skenario Nyata Proposal:</label>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            <button id="scenarioDropOxygen" class="scenario-btn group hover:border-red-500/50 hover:bg-red-950/20">
-              <div class="text-red-400 group-hover:scale-110 transition-transform"><i data-lucide="arrow-down-circle" class="w-5 h-5"></i></div>
+        <!-- Tombol Skenario Cepat -->
+        <div class="pt-3 border-t border-stone-800">
+          <div class="text-xs text-stone-400 mb-2">Pilih skenario operasional:</div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+            <button id="scenarioDropOxygen" class="scenario-btn whitespace-nowrap">
+              <div class="text-red-400"><i data-lucide="arrow-down-circle" class="w-4 h-4"></i></div>
               <div class="text-left">
-                <div class="text-xs font-bold text-white">1. Oksigen Drop (4.6 mg/L)</div>
-                <div class="text-[11px] text-slate-400">Picu aerator ON & alert WA</div>
+                <div class="text-xs font-semibold text-stone-200">1. Oksigen Drop (4.6 mg/L)</div>
+                <div class="text-[11px] text-stone-400">Picu aerator ON &amp; alert WA</div>
               </div>
             </button>
 
-            <button id="scenarioFeedSchedule" class="scenario-btn group hover:border-emerald-500/50 hover:bg-emerald-950/20">
-              <div class="text-emerald-400 group-hover:scale-110 transition-transform"><i data-lucide="clock" class="w-5 h-5"></i></div>
+            <button id="scenarioFeedSchedule" class="scenario-btn whitespace-nowrap">
+              <div class="text-emerald-400"><i data-lucide="clock" class="w-4 h-4"></i></div>
               <div class="text-left">
-                <div class="text-xs font-bold text-white">2. Jadwal Pakan Tiba</div>
-                <div class="text-[11px] text-slate-400">Putar motor feeder servo</div>
+                <div class="text-xs font-semibold text-stone-200">2. Jadwal Pakan Tiba</div>
+                <div class="text-[11px] text-stone-400">Putar motor feeder servo</div>
               </div>
             </button>
 
-            <button id="scenarioNetworkCut" class="scenario-btn group hover:border-amber-500/50 hover:bg-amber-950/20">
-              <div class="text-amber-400 group-hover:scale-110 transition-transform"><i data-lucide="wifi-off" class="w-5 h-5"></i></div>
+            <button id="scenarioNetworkCut" class="scenario-btn whitespace-nowrap">
+              <div class="text-amber-400"><i data-lucide="wifi-off" class="w-4 h-4"></i></div>
               <div class="text-left">
-                <div class="text-xs font-bold text-white">3. Wi-Fi Terputus (Offline)</div>
-                <div class="text-[11px] text-slate-400">Uji caching lokal ESP32</div>
+                <div class="text-xs font-semibold text-stone-200">3. Wi-Fi Terputus</div>
+                <div class="text-[11px] text-stone-400">Uji caching lokal ESP32</div>
               </div>
             </button>
 
-            <button id="scenarioRestoreNormal" class="scenario-btn group hover:border-cyan-500/50 hover:bg-cyan-950/20">
-              <div class="text-cyan-400 group-hover:scale-110 transition-transform"><i data-lucide="check-check" class="w-5 h-5"></i></div>
+            <button id="scenarioRestoreNormal" class="scenario-btn whitespace-nowrap">
+              <div class="text-cyan-400"><i data-lucide="check-check" class="w-4 h-4"></i></div>
               <div class="text-left">
-                <div class="text-xs font-bold text-white">4. Pulihkan Kondisi Normal</div>
-                <div class="text-[11px] text-slate-400">Reset parameter ke aman</div>
+                <div class="text-xs font-semibold text-stone-200">4. Pulihkan Kondisi Normal</div>
+                <div class="text-[11px] text-stone-400">Reset parameter ke aman</div>
               </div>
             </button>
           </div>
         </div>
       </div>
 
-      <!-- SLIDERS MANUAL KUALITAS AIR -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Sliders & Terminal -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-        <!-- Panel Slider Sensor -->
-        <div class="bg-slate-800/60 border border-slate-700/70 rounded-2xl p-5 space-y-4">
-          <h3 class="text-sm font-bold text-white flex items-center gap-2">
-            <i data-lucide="sliders-horizontal" class="w-4 h-4 text-cyan-400"></i>
-            Manipulasi Manual Sensor Kolam
-          </h3>
+        <!-- Sliders -->
+        <div class="metric-card space-y-3.5">
+          <h3 class="text-sm font-semibold text-stone-100">Manipulasi Nilai Sensor</h3>
 
           <!-- Slider DO -->
           <div>
             <div class="flex justify-between text-xs mb-1 font-medium">
-              <span class="text-slate-300">Oksigen Terlarut (DO):</span>
+              <span class="text-stone-300">Oksigen terlarut (DO):</span>
               <span id="sliderValDO" class="font-mono text-cyan-400 font-bold">5.4 mg/L</span>
             </div>
             <input type="range" id="simSliderDO" min="2.0" max="9.0" step="0.1" value="5.4" class="w-full accent-cyan-500">
-            <div class="flex justify-between text-[10px] text-slate-400 mt-0.5">
+            <div class="flex justify-between text-[10px] text-stone-400 mt-0.5">
               <span>Bahaya (&lt; 4.0)</span>
-              <span class="text-red-400 font-semibold">Ambang Batas (5.0)</span>
-              <span>Sangat Baik (&gt; 7.0)</span>
+              <span class="text-red-400 font-medium">Batas aman: 5.0</span>
+              <span>Kaya (&gt; 7.0)</span>
             </div>
           </div>
 
           <!-- Slider Suhu -->
           <div>
             <div class="flex justify-between text-xs mb-1 font-medium">
-              <span class="text-slate-300">Suhu Air:</span>
+              <span class="text-stone-300">Suhu air:</span>
               <span id="sliderValTemp" class="font-mono text-rose-400 font-bold">28.5 °C</span>
             </div>
             <input type="range" id="simSliderTemp" min="20.0" max="38.0" step="0.5" value="28.5" class="w-full accent-rose-500">
-            <div class="flex justify-between text-[10px] text-slate-400 mt-0.5">
+            <div class="flex justify-between text-[10px] text-stone-400 mt-0.5">
               <span>Dingin (20°C)</span>
-              <span class="text-emerald-400 font-semibold">Ideal (28 - 30°C)</span>
+              <span class="text-emerald-400 font-medium">Ideal (28 - 30°C)</span>
               <span>Panas (38°C)</span>
             </div>
           </div>
@@ -452,55 +424,54 @@
           <!-- Slider pH -->
           <div>
             <div class="flex justify-between text-xs mb-1 font-medium">
-              <span class="text-slate-300">pH Air:</span>
+              <span class="text-stone-300">pH air:</span>
               <span id="sliderValPH" class="font-mono text-sky-400 font-bold">7.4</span>
             </div>
             <input type="range" id="simSliderPH" min="5.0" max="10.0" step="0.1" value="7.4" class="w-full accent-sky-500">
-            <div class="flex justify-between text-[10px] text-slate-400 mt-0.5">
+            <div class="flex justify-between text-[10px] text-stone-400 mt-0.5">
               <span>Asam (5.0)</span>
-              <span class="text-emerald-400 font-semibold">Netral-Basa (7.2 - 8.2)</span>
-              <span>Basa Tinggi (10.0)</span>
+              <span class="text-emerald-400 font-medium">Ideal (7.2 - 8.2)</span>
+              <span>Basa (10.0)</span>
             </div>
           </div>
 
           <!-- Slider Salinitas -->
           <div>
             <div class="flex justify-between text-xs mb-1 font-medium">
-              <span class="text-slate-300">Salinitas:</span>
+              <span class="text-stone-300">Salinitas:</span>
               <span id="sliderValSalinity" class="font-mono text-indigo-400 font-bold">18 ppt</span>
             </div>
             <input type="range" id="simSliderSalinity" min="0" max="40" step="1" value="18" class="w-full accent-indigo-500">
-            <div class="flex justify-between text-[10px] text-slate-400 mt-0.5">
+            <div class="flex justify-between text-[10px] text-stone-400 mt-0.5">
               <span>Tawar (0-5)</span>
-              <span class="text-emerald-400 font-semibold">Payau (15-25)</span>
-              <span>Laut Penuh (35)</span>
+              <span class="text-emerald-400 font-medium">Payau (15-25)</span>
+              <span>Laut (35)</span>
             </div>
           </div>
         </div>
 
-        <!-- Terminal Output ESP32 & MQTT Packet Monitor -->
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between font-mono">
+        <!-- Terminal -->
+        <div class="metric-card flex flex-col justify-between font-mono">
           <div>
-            <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-800">
-              <div class="flex items-center gap-2 text-xs text-slate-300">
-                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>ESP32 Virtual Terminal (UART &bull; 115200 baud)</span>
+            <div class="flex items-center justify-between pb-2 mb-2 border-b border-stone-800 text-xs text-stone-400">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                <span>ESP32 Virtual Terminal (UART 115200)</span>
               </div>
-              <button id="btnClearTerminal" class="text-[11px] text-slate-400 hover:text-white">Clear</button>
+              <button id="btnClearTerminal" class="text-stone-400 hover:text-stone-200">Clear</button>
             </div>
-            <div id="espTerminalOutput" class="h-64 overflow-y-auto text-xs space-y-1.5 scrollbar-thin text-slate-400 leading-relaxed pr-2">
-              <div class="text-slate-500">[BOOT] ESP32-WROOM-32D Initialized...</div>
-              <div class="text-cyan-400">[WIFI] Connected to AP: "SMKS-Puger-IoT-Mesh" (IP: 192.168.10.45)</div>
-              <div class="text-emerald-400">[MQTT] Connected to broker: mqtt.zerobug.team:1883</div>
-              <div class="text-slate-300">[ADC] Calibration offsets loaded for DS18B20, pH-4502C, DO-probe.</div>
+            <div id="espTerminalOutput" class="h-64 overflow-y-auto text-xs space-y-1 text-stone-400 pr-1">
+              <div class="text-stone-500">[BOOT] ESP32-WROOM-32D Initialized.</div>
+              <div class="text-cyan-400">[WIFI] Terhubung ke AP: SMKS-Puger-IoT</div>
+              <div class="text-emerald-400">[MQTT] Terkoneksi broker: mqtt.wiru.internal:1883</div>
             </div>
           </div>
 
-          <div class="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-xs text-slate-500">
-            <span>Paket Terkirim: <b id="packetCount" class="text-slate-300">124</b></span>
-            <span>Buffer Offline: <b id="offlineBufferCount" class="text-slate-300">0</b> records</span>
-            <button id="btnManualPush" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs">
-              Push MQTT Sekarang
+          <div class="mt-3 pt-2 border-t border-stone-800 flex items-center justify-between text-xs text-stone-400">
+            <span>Paket: <b id="packetCount" class="text-stone-200">124</b></span>
+            <span>Buffer: <b id="offlineBufferCount" class="text-stone-200">0</b></span>
+            <button id="btnManualPush" class="px-2 py-1 rounded bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs">
+              Push MQTT
             </button>
           </div>
         </div>
@@ -509,259 +480,220 @@
 
     </div>
 
-    <!-- ========================================================================= -->
-    <!-- TAB 3: DIAGRAM 4 LAPISAN SISTEM (Gambar 1 Proposal)                       -->
-    <!-- ========================================================================= -->
-    <div id="tab-architecture" class="tab-content hidden space-y-6">
+    <!-- TAB 3: DIAGRAM 4 LAPISAN SISTEM -->
+    <div id="tab-architecture" class="tab-content hidden space-y-5">
 
-      <div class="bg-slate-800/60 border border-slate-700/70 rounded-2xl p-6 shadow-xl">
-        <div class="max-w-3xl mb-6">
-          <h2 class="text-lg font-bold text-white flex items-center gap-2">
-            <i data-lucide="layers" class="w-5 h-5 text-indigo-400"></i>
-            Visualisasi Alur Kerja 4 Lapisan Sistem
-          </h2>
-          <p class="text-xs text-slate-400 mt-1">
-            Data bergerak naik dari kolam hingga ke pengguna, sedangkan perintah automasi & kontrol manual mengalir ke bawah menggerakkan aktuator di tambak.
-          </p>
-        </div>
+      <div class="metric-card">
+        <h2 class="text-base font-semibold text-stone-100">Visualisasi 4 Lapisan Sistem</h2>
+        <p class="text-xs text-stone-400 mt-1 mb-4">
+          Data bergerak naik dari kolam hingga ke pengguna, sedangkan perintah automasi mengalir ke bawah menggerakkan aktuator di tambak.
+        </p>
 
-        <!-- 4 Layer Architecture Interactive Cards -->
-        <div class="space-y-4">
-
-          <!-- Layer 4: PENGGUNA -->
-          <div class="arch-layer border-blue-500/40 bg-blue-950/20" id="layer-users">
-            <div class="flex items-center justify-between mb-3">
+        <div class="space-y-3">
+          <!-- Layer 4 -->
+          <div class="arch-layer">
+            <div class="flex items-center justify-between mb-2">
               <div class="flex items-center gap-2">
-                <span class="layer-number bg-blue-500">4</span>
-                <h3 class="text-sm font-bold text-blue-300 uppercase tracking-wider">Lapisan Pengguna (Melihat Data & Memberi Perintah)</h3>
+                <span class="layer-number bg-blue-500/20 text-blue-300 border border-blue-500/30">4</span>
+                <h3 class="text-xs font-semibold text-stone-200">Lapisan Pengguna (Melihat Data &amp; Memberi Perintah)</h3>
               </div>
-              <span class="text-xs text-blue-400 font-mono">Web &bull; Mobile &bull; Messenger</span>
+              <span class="text-xs text-stone-400 font-mono">Web / Mobile / Messenger</span>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <div class="p-3 rounded-xl bg-slate-900/70 border border-slate-700/60">
-                <div class="font-semibold text-xs text-white flex items-center gap-1.5 mb-1">
-                  <i data-lucide="monitor" class="w-3.5 h-3.5 text-blue-400"></i> Dashboard Web
-                </div>
-                <p class="text-[11px] text-slate-400">Khusus Admin & Guru untuk konfigurasi batas dan kontrol penuh.</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs">
+              <div class="p-2.5 rounded bg-stone-900 border border-stone-800">
+                <div class="font-medium text-stone-200 mb-0.5">Dashboard Web</div>
+                <p class="text-stone-400">Khusus Admin dan Guru untuk konfigurasi batas dan kontrol penuh.</p>
               </div>
-              <div class="p-3 rounded-xl bg-slate-900/70 border border-slate-700/60">
-                <div class="font-semibold text-xs text-white flex items-center gap-1.5 mb-1">
-                  <i data-lucide="smartphone" class="w-3.5 h-3.5 text-blue-400"></i> Aplikasi Ponsel (Flutter)
-                </div>
-                <p class="text-[11px] text-slate-400">Mudah diakses guru di lapangan & siswa untuk sarana praktikum.</p>
+              <div class="p-2.5 rounded bg-stone-900 border border-stone-800">
+                <div class="font-medium text-stone-200 mb-0.5">Aplikasi Ponsel (Flutter)</div>
+                <p class="text-stone-400">Mudah diakses guru di lapangan dan siswa untuk sarana praktikum.</p>
               </div>
-              <div class="p-3 rounded-xl bg-slate-900/70 border border-slate-700/60">
-                <div class="font-semibold text-xs text-white flex items-center gap-1.5 mb-1">
-                  <i data-lucide="bell-ring" class="w-3.5 h-3.5 text-emerald-400"></i> Notifikasi Instan
-                </div>
-                <p class="text-[11px] text-slate-400">Bot WhatsApp & Telegram bila terjadi anomali darurat kualitas air.</p>
+              <div class="p-2.5 rounded bg-stone-900 border border-stone-800">
+                <div class="font-medium text-stone-200 mb-0.5">Notifikasi Instan</div>
+                <p class="text-stone-400">Bot WhatsApp dan Telegram bila terjadi anomali darurat kualitas air.</p>
               </div>
             </div>
           </div>
 
-          <!-- Flow Arrow Down & Up -->
-          <div class="flex justify-center items-center gap-8 py-1 text-slate-400 text-xs font-mono">
-            <span class="flex items-center gap-1 text-cyan-400"><i data-lucide="arrow-up" class="w-3.5 h-3.5"></i> Stream Data</span>
-            <span class="flex items-center gap-1 text-rose-400"><i data-lucide="arrow-down" class="w-3.5 h-3.5"></i> Instruksi Aktuator</span>
+          <!-- Flow Arrow -->
+          <div class="flex justify-center items-center gap-6 text-xs text-stone-400 font-mono">
+            <span class="text-cyan-400">&uarr; Stream Data</span>
+            <span class="text-rose-400">&darr; Instruksi Aktuator</span>
           </div>
 
-          <!-- Layer 3: SERVER -->
-          <div class="arch-layer border-amber-500/40 bg-amber-950/20" id="layer-server">
-            <div class="flex items-center justify-between mb-3">
+          <!-- Layer 3 -->
+          <div class="arch-layer">
+            <div class="flex items-center justify-between mb-2">
               <div class="flex items-center gap-2">
-                <span class="layer-number bg-amber-500">3</span>
-                <h3 class="text-sm font-bold text-amber-300 uppercase tracking-wider">Lapisan Server (Penyimpanan & Logika Otomatis)</h3>
+                <span class="layer-number bg-amber-500/20 text-amber-300 border border-amber-500/30">3</span>
+                <h3 class="text-xs font-semibold text-stone-200">Lapisan Server (Penyimpanan &amp; Logika Otomatis)</h3>
               </div>
-              <span class="text-xs text-amber-400 font-mono">Laravel REST API &bull; MySQL</span>
+              <span class="text-xs text-stone-400 font-mono">Laravel REST API / MySQL</span>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-              <div class="p-3 rounded-xl bg-slate-900/70 border border-slate-700/60">
-                <div class="font-semibold text-xs text-white">RESTful API</div>
-                <p class="text-[11px] text-slate-400">Gateway penghubung data IoT ke database.</p>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-2 text-xs">
+              <div class="p-2.5 rounded bg-stone-900 border border-stone-800">
+                <div class="font-medium text-stone-200">RESTful API</div>
+                <p class="text-stone-400">Gateway penghubung data IoT ke database.</p>
               </div>
-              <div class="p-3 rounded-xl bg-slate-900/70 border border-slate-700/60">
-                <div class="font-semibold text-xs text-white">Database MySQL</div>
-                <p class="text-[11px] text-slate-400">Menyimpan riwayat sensor per menit untuk bahan riset siswa.</p>
+              <div class="p-2.5 rounded bg-stone-900 border border-stone-800">
+                <div class="font-medium text-stone-200">Database MySQL</div>
+                <p class="text-stone-400">Menyimpan riwayat sensor per menit untuk bahan ajar.</p>
               </div>
-              <div class="p-3 rounded-xl bg-slate-900/70 border border-slate-700/60">
-                <div class="font-semibold text-xs text-white">Aturan Peringatan</div>
-                <p class="text-[11px] text-slate-400">Evaluasi threshold (DO &lt; 5.0, Temp &gt; 32°C).</p>
+              <div class="p-2.5 rounded bg-stone-900 border border-stone-800">
+                <div class="font-medium text-stone-200">Aturan Peringatan</div>
+                <p class="text-stone-400">Evaluasi batas ambang DO dan suhu.</p>
               </div>
-              <div class="p-3 rounded-xl bg-slate-900/70 border border-slate-700/60">
-                <div class="font-semibold text-xs text-white">Penjadwal Otomatis</div>
-                <p class="text-[11px] text-slate-400">Cron job pengatur jadwal pakan ikan 3x sehari.</p>
+              <div class="p-2.5 rounded bg-stone-900 border border-stone-800">
+                <div class="font-medium text-stone-200">Penjadwal Otomatis</div>
+                <p class="text-stone-400">Pengatur jadwal pakan ikan 3 kali sehari.</p>
               </div>
             </div>
           </div>
 
-          <!-- Flow Arrow Down & Up -->
-          <div class="flex justify-center items-center gap-8 py-1 text-slate-400 text-xs font-mono">
-            <span class="flex items-center gap-1 text-cyan-400"><i data-lucide="arrow-up" class="w-3.5 h-3.5"></i> MQTT Payload</span>
-            <span class="flex items-center gap-1 text-rose-400"><i data-lucide="arrow-down" class="w-3.5 h-3.5"></i> Relay Command</span>
+          <!-- Flow Arrow -->
+          <div class="flex justify-center items-center gap-6 text-xs text-stone-400 font-mono">
+            <span class="text-cyan-400">&uarr; MQTT Payload</span>
+            <span class="text-rose-400">&darr; Relay Command</span>
           </div>
 
-          <!-- Layer 2: JARINGAN -->
-          <div class="arch-layer border-purple-500/40 bg-purple-950/20" id="layer-network">
-            <div class="flex items-center justify-between mb-3">
+          <!-- Layer 2 -->
+          <div class="arch-layer">
+            <div class="flex items-center justify-between mb-2">
               <div class="flex items-center gap-2">
-                <span class="layer-number bg-purple-500">2</span>
-                <h3 class="text-sm font-bold text-purple-300 uppercase tracking-wider">Lapisan Jaringan (Transmisi Data)</h3>
+                <span class="layer-number bg-purple-500/20 text-purple-300 border border-purple-500/30">2</span>
+                <h3 class="text-xs font-semibold text-stone-200">Lapisan Jaringan (Transmisi Data)</h3>
               </div>
-              <span class="text-xs text-purple-400 font-mono">Wi-Fi &bull; MQTT &bull; HTTPS</span>
+              <span class="text-xs text-stone-400 font-mono">Wi-Fi / MQTT / HTTPS</span>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <div class="p-3 rounded-xl bg-slate-900/70 border border-slate-700/60">
-                <div class="font-semibold text-xs text-white">Wi-Fi / Seluler 4G</div>
-                <p class="text-[11px] text-slate-400">Konektivitas nirkabel dari kolam tambak Puger ke router.</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs">
+              <div class="p-2.5 rounded bg-stone-900 border border-stone-800">
+                <div class="font-medium text-stone-200">Wi-Fi / Seluler</div>
+                <p class="text-stone-400">Konektivitas nirkabel dari kolam tambak Puger ke router.</p>
               </div>
-              <div class="p-3 rounded-xl bg-slate-900/70 border border-slate-700/60">
-                <div class="font-semibold text-xs text-white">Protokol MQTT</div>
-                <p class="text-[11px] text-slate-400">Ringan, hemat kuota internet, *low-latency* real-time telemetry.</p>
+              <div class="p-2.5 rounded bg-stone-900 border border-stone-800">
+                <div class="font-medium text-stone-200">Protokol MQTT</div>
+                <p class="text-stone-400">Ringan dan hemat kuota data untuk telemetri.</p>
               </div>
-              <div class="p-3 rounded-xl bg-slate-900/70 border border-slate-700/60">
-                <div class="font-semibold text-xs text-white">Enkripsi TLS/HTTPS</div>
-                <p class="text-[11px] text-slate-400">Keamanan data transmisi agar tidak disadap.</p>
+              <div class="p-2.5 rounded bg-stone-900 border border-stone-800">
+                <div class="font-medium text-stone-200">Enkripsi TLS/HTTPS</div>
+                <p class="text-stone-400">Keamanan data transmisi.</p>
               </div>
             </div>
           </div>
 
-          <!-- Flow Arrow Down & Up -->
-          <div class="flex justify-center items-center gap-8 py-1 text-slate-400 text-xs font-mono">
-            <span class="flex items-center gap-1 text-cyan-400"><i data-lucide="arrow-up" class="w-3.5 h-3.5"></i> Raw Voltage to Digital</span>
-            <span class="flex items-center gap-1 text-rose-400"><i data-lucide="arrow-down" class="w-3.5 h-3.5"></i> GPIO Output High/Low</span>
+          <!-- Flow Arrow -->
+          <div class="flex justify-center items-center gap-6 text-xs text-stone-400 font-mono">
+            <span class="text-cyan-400">&uarr; Raw Voltage</span>
+            <span class="text-rose-400">&darr; GPIO Logic</span>
           </div>
 
-          <!-- Layer 1: PERANGKAT FISIK -->
-          <div class="arch-layer border-emerald-500/40 bg-emerald-950/20" id="layer-hardware">
-            <div class="flex items-center justify-between mb-3">
+          <!-- Layer 1 -->
+          <div class="arch-layer">
+            <div class="flex items-center justify-between mb-2">
               <div class="flex items-center gap-2">
-                <span class="layer-number bg-emerald-500">1</span>
-                <h3 class="text-sm font-bold text-emerald-300 uppercase tracking-wider">Lapisan Perangkat Fisik (Tambak & Kolam)</h3>
+                <span class="layer-number bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">1</span>
+                <h3 class="text-xs font-semibold text-stone-200">Lapisan Perangkat Fisik (Tambak &amp; Kolam)</h3>
               </div>
-              <span class="text-xs text-emerald-400 font-mono">ESP32 &bull; Sensor Air &bull; Relay</span>
+              <span class="text-xs text-stone-400 font-mono">ESP32 / Sensor / Relay</span>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <div class="p-3 rounded-xl bg-slate-900/70 border border-slate-700/60">
-                <div class="font-semibold text-xs text-white flex items-center gap-1">
-                  <i data-lucide="activity" class="w-3.5 h-3.5 text-cyan-400"></i> Probe Sensor Air
-                </div>
-                <p class="text-[11px] text-slate-400">DS18B20 (Suhu), Elektroda pH, Sensor Salinitas/TDS, Turbidity, DO Probe.</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs">
+              <div class="p-2.5 rounded bg-stone-900 border border-stone-800">
+                <div class="font-medium text-stone-200">Probe Sensor Air</div>
+                <p class="text-stone-400">DS18B20 (Suhu), elektroda pH, sensor salinitas, kekeruhan, dan DO.</p>
               </div>
-              <div class="p-3 rounded-xl bg-slate-900/70 border border-slate-700/60">
-                <div class="font-semibold text-xs text-white flex items-center gap-1">
-                  <i data-lucide="cpu" class="w-3.5 h-3.5 text-emerald-400"></i> ESP32 Mikrokontroler
-                </div>
-                <p class="text-[11px] text-slate-400">Dual-core 240MHz, membaca ADC analog, kalkulasi kalibrasi & pengiriman paket.</p>
+              <div class="p-2.5 rounded bg-stone-900 border border-stone-800">
+                <div class="font-medium text-stone-200">ESP32 Mikrokontroler</div>
+                <p class="text-stone-400">Membaca ADC analog, kompensasi suhu, dan pengiriman paket.</p>
               </div>
-              <div class="p-3 rounded-xl bg-slate-900/70 border border-slate-700/60">
-                <div class="font-semibold text-xs text-white flex items-center gap-1">
-                  <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-400"></i> Modul Relay & Aktuator
-                </div>
-                <p class="text-[11px] text-slate-400">Relay 30A untuk aerator kincir air, pompa celup sirkulasi, servo feeder.</p>
+              <div class="p-2.5 rounded bg-stone-900 border border-stone-800">
+                <div class="font-medium text-stone-200">Relay &amp; Aktuator</div>
+                <p class="text-stone-400">Relay untuk kincir air, pompa celup sirkulasi, dan servo feeder.</p>
               </div>
             </div>
           </div>
-
         </div>
       </div>
 
     </div>
 
-    <!-- ========================================================================= -->
-    <!-- TAB 4: LOG RIWAYAT & NOTIFIKASI                                           -->
-    <!-- ========================================================================= -->
-    <div id="tab-logs" class="tab-content hidden space-y-6">
+    <!-- TAB 4: LOG RIWAYAT & NOTIFIKASI -->
+    <div id="tab-logs" class="tab-content hidden space-y-5">
 
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
         <!-- Tabel Log Kejadian -->
-        <div class="lg:col-span-2 bg-slate-800/60 border border-slate-700/70 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
+        <div class="lg:col-span-2 metric-card flex flex-col justify-between">
           <div>
-            <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
               <div>
-                <h2 class="text-base font-bold text-white flex items-center gap-2">
-                  <i data-lucide="file-text" class="w-4 h-4 text-cyan-400"></i>
-                  Riwayat Kejadian Sistem (*Event Audit Log*)
-                </h2>
-                <p class="text-xs text-slate-400">Catatan otomatisasi, peringatan dini, dan aksi pengguna</p>
+                <h2 class="text-sm font-semibold text-stone-100">Riwayat Kejadian Sistem</h2>
+                <p class="text-xs text-stone-400">Catatan otomatisasi, peringatan dini, dan aksi pengguna</p>
               </div>
-              <button id="btnExportCSV" class="text-xs px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 font-semibold text-white flex items-center gap-1.5 transition">
+              <button id="btnExportCSV" class="text-xs px-3 py-1.5 rounded bg-stone-800 hover:bg-stone-700 text-stone-200 font-medium flex items-center gap-1.5 transition-colors">
                 <i data-lucide="download" class="w-3.5 h-3.5"></i> Unduh CSV
               </button>
             </div>
 
-            <!-- Table Container -->
-            <div class="overflow-x-auto rounded-xl border border-slate-700/60">
+            <!-- Table -->
+            <div class="overflow-x-auto rounded border border-stone-800">
               <table class="w-full text-left text-xs">
-                <thead class="bg-slate-900/90 text-slate-300 font-semibold uppercase tracking-wider text-[11px]">
+                <thead class="bg-stone-900 text-stone-300 font-medium text-[11px]">
                   <tr>
-                    <th class="p-3">Waktu</th>
-                    <th class="p-3">Kejadian</th>
-                    <th class="p-3">Parameter Terkait</th>
-                    <th class="p-3">Aksi Sistem</th>
-                    <th class="p-3">Status</th>
+                    <th class="p-2.5">Waktu</th>
+                    <th class="p-2.5">Kejadian</th>
+                    <th class="p-2.5">Parameter</th>
+                    <th class="p-2.5">Aksi Sistem</th>
+                    <th class="p-2.5">Status</th>
                   </tr>
                 </thead>
-                <tbody id="logsTableBody" class="divide-y divide-slate-800 font-mono text-slate-300">
+                <tbody id="logsTableBody" class="divide-y divide-stone-800 font-mono text-stone-300">
                   <!-- Populated by JS -->
                 </tbody>
               </table>
             </div>
           </div>
 
-          <div class="mt-4 pt-3 border-t border-slate-700/60 text-xs text-slate-400 flex items-center justify-between">
-            <span>Menampilkan data tersimpan di Local Storage</span>
-            <button id="btnClearLogs" class="text-rose-400 hover:underline">Kosongkan Log</button>
+          <div class="mt-3 pt-2 border-t border-stone-800 text-xs text-stone-400 flex items-center justify-between">
+            <span>Tersimpan di memori browser</span>
+            <button id="btnClearLogs" class="text-stone-400 hover:text-stone-200">Kosongkan Log</button>
           </div>
         </div>
 
-        <!-- Mockup WhatsApp / Telegram Notification Chat Preview -->
-        <div class="bg-slate-800/60 border border-slate-700/70 rounded-2xl p-5 shadow-xl flex flex-col">
-          <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-700/60">
+        <!-- WhatsApp Mockup -->
+        <div class="metric-card flex flex-col">
+          <div class="flex items-center justify-between mb-3 pb-2 border-b border-stone-800">
             <div>
-              <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                <i data-lucide="message-circle" class="w-4 h-4 text-emerald-400"></i>
-                Simulasi Chat WhatsApp Guru
-              </h3>
-              <p class="text-xs text-slate-400">Bot ZeroBug IoT &bull; Guru Pembimbing</p>
+              <h3 class="text-xs font-semibold text-stone-200">Simulasi WhatsApp Guru</h3>
+              <p class="text-[11px] text-stone-400">Bot WIRU IoT / Guru Pembimbing</p>
             </div>
-            <span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/30">
-              Online
-            </span>
+            <span class="text-[11px] text-emerald-400">Online</span>
           </div>
 
           <!-- Chat Window -->
-          <div class="bg-[#0b141a] rounded-xl p-3 h-80 overflow-y-auto space-y-3 flex-1 flex flex-col justify-end border border-slate-800">
-            <!-- Bubble Pesan Masuk 1 -->
-            <div class="bg-[#202c33] text-slate-200 text-xs rounded-lg rounded-tl-none p-3 max-w-[90%] shadow">
-              <div class="font-bold text-emerald-400 text-[11px] mb-1 flex items-center gap-1">
-                <i data-lucide="bot" class="w-3 h-3"></i> Bot IoT SMKS Puger
-              </div>
+          <div class="bg-stone-950 rounded p-3 h-72 overflow-y-auto space-y-2.5 flex-1 flex flex-col justify-end border border-stone-800 text-xs">
+            <div class="bg-stone-900 text-stone-200 rounded p-2.5 max-w-[90%]">
+              <div class="font-semibold text-emerald-400 text-[11px] mb-1">Bot WIRU IoT / SMKS Puger</div>
               <p class="text-[11px] leading-relaxed">
-                🟢 <b>Laporan Harian (07:00 WIB)</b><br>
+                Laporan Harian (07:00 WIB)<br>
                 Kolam A Tambak Vaname kondisi normal.<br>
-                DO: 5.4 mg/L | Suhu: 28.5°C | pH: 7.4
+                DO: 5.4 mg/L / Suhu: 28.5°C / pH: 7.4
               </p>
-              <div class="text-[9px] text-slate-400 text-right mt-1">07:00 WIB</div>
+              <div class="text-[9px] text-stone-500 text-right mt-1">07:00 WIB</div>
             </div>
 
-            <!-- Dynamic Alert Chat Bubble -->
-            <div id="dynamicChatBubble" class="hidden bg-[#202c33] text-slate-200 text-xs rounded-lg rounded-tl-none p-3 max-w-[90%] border-l-4 border-rose-500 shadow">
-              <div class="font-bold text-rose-400 text-[11px] mb-1 flex items-center gap-1">
-                <i data-lucide="alert-octagon" class="w-3 h-3"></i> PERINGATAN DARURAT
-              </div>
+            <div id="dynamicChatBubble" class="hidden bg-stone-900 text-stone-200 rounded p-2.5 max-w-[90%] border-l-2 border-red-500">
+              <div class="font-semibold text-red-400 text-[11px] mb-1">Peringatan Darurat</div>
               <p id="chatAlertText" class="text-[11px] leading-relaxed">
-                ⚠️ <b>Oksigen Kolam Menurun!</b><br>
+                Oksigen Kolam Menurun<br>
                 DO: 4.6 mg/L (Batas aman: 5.0 mg/L).<br>
                 Aerator otomatis telah dinyalakan oleh sistem.
               </p>
-              <div id="chatAlertTime" class="text-[9px] text-slate-400 text-right mt-1">14:10 WIB</div>
+              <div id="chatAlertTime" class="text-[9px] text-stone-500 text-right mt-1">14:10 WIB</div>
             </div>
           </div>
 
-          <div class="mt-3">
-            <button id="btnSendTestWA" class="w-full py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-xs font-semibold text-slate-200 flex items-center justify-center gap-2 transition">
-              <i data-lucide="send" class="w-3.5 h-3.5 text-emerald-400"></i>
+          <div class="mt-2.5">
+            <button id="btnSendTestWA" class="w-full py-1.5 rounded bg-stone-800 hover:bg-stone-700 text-xs font-medium text-stone-300 transition-colors whitespace-nowrap">
               Kirim Pesan Uji Coba Manual
             </button>
           </div>
@@ -771,81 +703,55 @@
 
     </div>
 
-    <!-- ========================================================================= -->
-    <!-- TAB 5: TRAINER KIT SISWA (EDUKASI VOKASI)                                  -->
-    <!-- ========================================================================= -->
-    <div id="tab-trainer" class="tab-content hidden space-y-6">
+    <!-- TAB 5: TRAINER KIT SISWA -->
+    <div id="tab-trainer" class="tab-content hidden space-y-5">
 
-      <div class="bg-slate-800/60 border border-slate-700/70 rounded-2xl p-6 shadow-xl">
-        <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
-          <div>
-            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 uppercase">
-              Modul Vokasi SMKS Perikanan Puger
-            </span>
-            <h2 class="text-xl font-bold text-white mt-1">Sarana Praktik & Pembelajaran Siswa</h2>
-            <p class="text-sm text-slate-300">
-              Paket Lengkap mencakup Trainer Kit IoT agar siswa tidak sekadar menjadi pengguna, namun memahami logika sensor, pembacaan ADC, dan pemrograman mikrokontroler.
-            </p>
-          </div>
-          <div class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs text-slate-300 flex items-center gap-2">
-            <i data-lucide="check" class="w-4 h-4 text-emerald-400"></i> Kurikulum Merdeka Vokasi Ready
-          </div>
-        </div>
+      <div class="metric-card">
+        <h2 class="text-base font-semibold text-stone-100">Sarana Praktik dan Pembelajaran Siswa</h2>
+        <p class="text-xs text-stone-400 mt-1 mb-4">
+          Paket Lengkap mencakup Trainer Kit IoT agar siswa memahami logika pembacaan sensor ADC, kalibrasi, dan pemrograman mikrokontroler.
+        </p>
 
-        <!-- Grid 3 Modul Pembelajaran -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-700/60">
-            <div class="w-8 h-8 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center mb-3">
-              <i data-lucide="book-open" class="w-4 h-4"></i>
-            </div>
-            <h3 class="text-sm font-bold text-white mb-1">Modul 1: Kalibrasi Sensor</h3>
-            <p class="text-xs text-slate-400 leading-relaxed">
-              Siswa belajar kalibrasi probe pH (buffer 4.01 & 6.86) serta kompensasi suhu pada sensor TDS dan DO air payau.
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4 text-xs">
+          <div class="p-3 rounded bg-stone-900 border border-stone-800">
+            <div class="font-semibold text-stone-200 mb-1">Modul 1: Kalibrasi Sensor</div>
+            <p class="text-stone-400 leading-relaxed">
+              Kalibrasi probe pH (buffer 4.01 &amp; 6.86) serta kompensasi suhu pada sensor TDS dan DO air payau.
             </p>
           </div>
 
-          <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-700/60">
-            <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-3">
-              <i data-lucide="code" class="w-4 h-4"></i>
-            </div>
-            <h3 class="text-sm font-bold text-white mb-1">Modul 2: Logika Otomasi ESP32</h3>
-            <p class="text-xs text-slate-400 leading-relaxed">
-              Memprogram relai aerator otomatis berdasarkan ambang batas (*threshold condition*) dan proteksi *hysteresis* agar relay tidak cepat aus.
+          <div class="p-3 rounded bg-stone-900 border border-stone-800">
+            <div class="font-semibold text-stone-200 mb-1">Modul 2: Logika Otomasi ESP32</div>
+            <p class="text-stone-400 leading-relaxed">
+              Memprogram relai aerator berdasarkan ambang batas dan proteksi hysteresis agar relay tidak cepat aus.
             </p>
           </div>
 
-          <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-700/60">
-            <div class="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center mb-3">
-              <i data-lucide="cloud-upload" class="w-4 h-4"></i>
-            </div>
-            <h3 class="text-sm font-bold text-white mb-1">Modul 3: MQTT & Dashboard</h3>
-            <p class="text-xs text-slate-400 leading-relaxed">
-              Mengirimkan payload format JSON melalui MQTT Broker dan merancang visualisasi grafik untuk interpretasi hasil panen.
+          <div class="p-3 rounded bg-stone-900 border border-stone-800">
+            <div class="font-semibold text-stone-200 mb-1">Modul 3: MQTT &amp; Dashboard</div>
+            <p class="text-stone-400 leading-relaxed">
+              Mengirimkan payload format JSON melalui MQTT Broker dan visualisasi grafik interpretasi hasil panen.
             </p>
           </div>
         </div>
 
-        <!-- Sample Code Viewer -->
-        <div class="rounded-xl bg-slate-950 border border-slate-800 p-4 font-mono text-xs">
-          <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-800 text-slate-400">
-            <div class="flex items-center gap-2">
-              <i data-lucide="file-code" class="w-4 h-4 text-emerald-400"></i>
-              <span>trainer_kit_smart_pond.ino (Cuplikan Praktik Siswa)</span>
-            </div>
-            <span class="text-[10px] bg-slate-800 px-2 py-0.5 rounded">C++ / Arduino IDE</span>
+        <div class="rounded bg-stone-950 border border-stone-800 p-3 font-mono text-xs">
+          <div class="flex items-center justify-between pb-2 mb-2 border-b border-stone-800 text-stone-400 text-[11px]">
+            <span>trainer_kit_smart_pond.ino (Cuplikan Praktik Siswa)</span>
+            <span>C++ / Arduino IDE</span>
           </div>
-          <pre class="text-slate-300 overflow-x-auto leading-relaxed">
-<span class="text-purple-400">#define</span> RELAY_AERATOR_PIN <span class="text-amber-400">23</span>
-<span class="text-purple-400">#define</span> DO_THRESHOLD_MIN  <span class="text-amber-400">5.0</span> <span class="text-slate-500">// mg/L</span>
+          <pre class="text-stone-300 overflow-x-auto leading-relaxed">
+#define RELAY_AERATOR_PIN 23
+#define DO_THRESHOLD_MIN  5.0 // mg/L
 
-<span class="text-cyan-400">void</span> <span class="text-emerald-400">evaluasiOksigen</span>(<span class="text-cyan-400">float</span> kadarDO) {
-    <span class="text-purple-400">if</span> (kadarDO &lt; DO_THRESHOLD_MIN) {
-        <span class="text-slate-500">// Oksigen kritis: Hidupkan aerator segera!</span>
-        <span class="text-emerald-400">digitalWrite</span>(RELAY_AERATOR_PIN, <span class="text-amber-400">HIGH</span>);
-        <span class="text-emerald-400">kirimPeringatanTelegram</span>(<span class="text-emerald-300">"DARURAT: DO Turun ke "</span> + <span class="text-emerald-400">String</span>(kadarDO));
-    } <span class="text-purple-400">else if</span> (kadarDO &gt;= <span class="text-amber-400">5.4</span>) {
-        <span class="text-slate-500">// Kondisi stabil dan hemat listrik: Matikan aerator</span>
-        <span class="text-emerald-400">digitalWrite</span>(RELAY_AERATOR_PIN, <span class="text-amber-400">LOW</span>);
+void evaluasiOksigen(float kadarDO) {
+    if (kadarDO &lt; DO_THRESHOLD_MIN) {
+        // Oksigen kritis: Hidupkan aerator segera
+        digitalWrite(RELAY_AERATOR_PIN, HIGH);
+        kirimPeringatanTelegram("DARURAT: DO Turun ke " + String(kadarDO));
+    } else if (kadarDO &gt;= 5.4) {
+        // Kondisi stabil dan hemat listrik: Matikan aerator
+        digitalWrite(RELAY_AERATOR_PIN, LOW);
     }
 }</pre>
         </div>
@@ -855,21 +761,7 @@
 
   </main>
 
-  <!-- FOOTER -->
-  <footer class="bg-slate-900 border-t border-slate-800 py-4 px-4 lg:px-8 text-center text-xs text-slate-400">
-    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-      <div class="flex items-center gap-2">
-        <span class="font-bold text-white">ZeroBug Team</span> &bull; 
-        <span>Website: <a href="https://zerobug-two.vercel.app" target="_blank" class="text-cyan-400 hover:underline">zerobug-two.vercel.app</a></span> &bull; 
-        <span>WA: +62 812-2952-3471</span>
-      </div>
-      <div>
-        <span>Proposal Prototype untuk <b>SMKS Perikanan dan Kelautan Puger</b></span>
-      </div>
-    </div>
-  </footer>
-
-  <!-- FLOATING TOAST NOTIFICATION CONTAINER -->
+  <!-- TOAST CONTAINER -->
   <div id="toastContainer" class="fixed bottom-5 right-5 z-50 space-y-2 pointer-events-none"></div>
 
   <script src="app.js"></script>

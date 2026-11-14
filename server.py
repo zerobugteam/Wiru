@@ -1,6 +1,6 @@
 """
-Smart Aquaculture IoT Demo Server
-ZeroBug Team x SMKS Perikanan dan Kelautan Puger
+WIRU - Water Intelligence for Raising Underwater life
+Demo Server | SMKS Perikanan dan Kelautan Puger
 """
 import http.server
 import socketserver
@@ -19,15 +19,14 @@ def run():
     os.chdir(DIRECTORY)
     with socketserver.TCPServer(("", PORT), Handler) as httpd:
         url = f"http://localhost:{PORT}/index.html"
-        print("=" * 60)
-        print(" ZeroBug Team - Smart Aquaculture IoT Simulation")
+        print("=" * 64)
+        print(" WIRU - Water Intelligence for Raising Underwater life")
         print(" SMKS Perikanan dan Kelautan Puger")
-        print("=" * 60)
+        print("=" * 64)
         print(f" Server berjalan di : {url}")
         print(" Tekan CTRL+C di terminal untuk menghentikan server.")
-        print("=" * 60)
+        print("=" * 64)
         
-        # Buka browser otomatis
         webbrowser.open(url)
         
         try:
