@@ -20,12 +20,15 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=3.2">
+  <link rel="stylesheet" href="style.css?v=4.0">
 </head>
 <body class="h-screen w-screen overflow-hidden flex bg-paper text-ink">
 
+  <!-- MOBILE SIDEBAR BACKDROP (Klik untuk tutup sidebar di mobile) -->
+  <div id="sidebarBackdrop" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden" onclick="toggleMobileSidebar()"></div>
+
   <!-- LEFT SCADA DASHBOARD SIDEBAR (Unslop Dashboard Reference Craft: #0f0f10, 256px) -->
-  <aside class="w-64 bg-sidebar border-r border-rule flex flex-col shrink-0 z-30 select-none">
+  <aside id="sidebarNav" class="w-64 bg-sidebar border-r border-rule flex flex-col shrink-0 z-50 select-none fixed inset-y-0 left-0 -translate-x-full lg:translate-x-0 lg:static lg:flex transition-transform duration-300 ease-out">
     
     <!-- Top Brand Header: Logo murni tanpa card/kotak -->
     <div class="h-16 px-4 border-b border-rule flex items-center justify-between">
@@ -37,15 +40,6 @@
         </div>
       </div>
       <span class="px-1.5 py-0.5 text-[9px] rounded bg-teal-500/10 text-teal-400 font-mono border border-teal-500/20 font-medium shrink-0 ml-1.5">v1.2</span>
-    </div>
-
-    <!-- Search Input (Unslop Reference Pattern with Keycap) -->
-    <div class="px-3 pt-3 pb-1">
-      <div class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-paper-2 border border-rule text-neutral-400 text-xs">
-        <i data-lucide="search" class="w-3.5 h-3.5 text-neutral-500 shrink-0"></i>
-        <input type="text" placeholder="Search..." class="bg-transparent text-xs text-ink placeholder-neutral-500 focus:outline-none flex-1 font-sans">
-        <span class="px-1.5 py-0.2 rounded bg-paper-3 text-[10px] text-neutral-400 font-mono border border-rule-2">⌘ K</span>
-      </div>
     </div>
 
     <!-- Sidebar Navigation Menu -->
@@ -109,20 +103,25 @@
   <div class="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
     
     <!-- TOP SCADA OPERATIONAL BAR (64px) -->
-    <header class="h-16 bg-paper border-b border-rule px-6 flex items-center justify-between shrink-0 z-20">
+    <header class="h-auto min-h-[56px] lg:h-16 bg-paper border-b border-rule px-3 sm:px-6 py-2 lg:py-0 flex flex-wrap items-center justify-between gap-2 shrink-0 z-20">
       
-      <!-- Left: Breadcrumb & Pond Selector -->
-      <div class="flex items-center gap-3">
-        <div class="flex items-center gap-1.5 text-xs text-neutral-400 font-mono">
+      <!-- Left: Hamburger + Breadcrumb & Pond Selector -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Mobile Hamburger Toggle -->
+        <button id="mobileMenuBtn" class="lg:hidden flex items-center justify-center w-9 h-9 rounded-lg bg-paper-2 border border-rule text-ink" onclick="toggleMobileSidebar()" aria-label="Toggle Menu">
+          <i data-lucide="menu" class="w-5 h-5"></i>
+        </button>
+
+        <div class="hidden sm:flex items-center gap-1.5 text-xs text-neutral-400 font-mono">
           <i data-lucide="layout-grid" class="w-3.5 h-3.5 text-neutral-500"></i>
           <span>Overview</span>
         </div>
 
-        <span class="text-neutral-600">/</span>
+        <span class="text-neutral-600 hidden sm:inline">/</span>
 
-        <div class="flex items-center gap-1.5 bg-paper-2 px-2.5 py-1.5 rounded-lg border border-rule text-xs">
-          <i data-lucide="map-pin" class="w-3.5 h-3.5 text-neutral-500"></i>
-          <select id="pondSelector" class="bg-transparent font-medium text-neutral-200 focus:outline-none cursor-pointer">
+        <div class="flex items-center gap-1.5 bg-paper-2 px-2 sm:px-2.5 py-1.5 rounded-lg border border-rule text-xs">
+          <i data-lucide="map-pin" class="w-3.5 h-3.5 text-neutral-500 hidden sm:inline"></i>
+          <select id="pondSelector" class="bg-transparent font-medium text-neutral-200 focus:outline-none cursor-pointer text-xs max-w-[160px] sm:max-w-none">
             <option value="Kolam A" class="bg-paper-2">Petak A1 (Vaname 1.200m²)</option>
             <option value="Kolam B" class="bg-paper-2">Petak A2 (Vaname 1.000m²)</option>
             <option value="Kolam C" class="bg-paper-2">Petak B1 (Nila Salin 800m²)</option>
@@ -131,14 +130,14 @@
       </div>
 
       <!-- Right: Theme Switcher, Role & Live Clock -->
-      <div class="flex items-center gap-2.5 text-xs">
+      <div class="flex items-center gap-1.5 sm:gap-2.5 text-xs">
         <!-- Theme Switcher (Dark / Light) -->
-        <button id="themeToggleBtn" type="button" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-paper-2 border border-rule text-neutral-300 hover:text-ink transition-colors cursor-pointer" title="Ubah Tema Terang / Gelap">
+        <button id="themeToggleBtn" type="button" class="flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-lg bg-paper-2 border border-rule text-neutral-300 hover:text-ink transition-colors cursor-pointer" title="Ubah Tema Terang / Gelap">
           <i data-lucide="sun" id="themeToggleIcon" class="w-3.5 h-3.5 text-amber-400"></i>
-          <span id="themeToggleText" class="font-mono text-[11px]">Terang</span>
+          <span id="themeToggleText" class="font-mono text-[11px] hidden sm:inline">Terang</span>
         </button>
 
-        <div class="flex items-center gap-1.5 bg-paper-2 px-2.5 py-1.5 rounded-lg border border-rule">
+        <div class="hidden sm:flex items-center gap-1.5 bg-paper-2 px-2.5 py-1.5 rounded-lg border border-rule">
           <i data-lucide="shield" class="w-3.5 h-3.5 text-neutral-500"></i>
           <span class="text-neutral-400">Peran:</span>
           <select id="userRoleSelector" class="bg-transparent font-medium text-amber-400 focus:outline-none cursor-pointer font-mono">
@@ -148,16 +147,50 @@
           </select>
         </div>
 
-        <div class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-paper-2 border border-rule text-neutral-400 font-mono">
+        <div class="flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-lg bg-paper-2 border border-rule text-neutral-400 font-mono">
           <i data-lucide="clock" class="w-3.5 h-3.5 text-neutral-500"></i>
-          <span id="liveClock">--:--:-- WIB</span>
+          <span id="liveClock" class="text-[10px] sm:text-xs">--:--:-- WIB</span>
         </div>
       </div>
 
     </header>
 
+    <!-- MOBILE HORIZONTAL TAB BAR (Visible only on mobile, below header) -->
+    <div id="mobileTabBar" class="lg:hidden bg-paper border-b border-rule overflow-x-auto shrink-0 scrollbar-hide">
+      <nav class="flex gap-0.5 px-2 py-1.5 min-w-max" id="mobileTabNav">
+        <button class="mobile-tab active" data-tab="tab-cockpit">
+          <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
+          <span>Cockpit</span>
+        </button>
+        <button class="mobile-tab" data-tab="tab-correlation">
+          <i data-lucide="line-chart" class="w-3.5 h-3.5"></i>
+          <span>Korelasi</span>
+        </button>
+        <button class="mobile-tab" data-tab="tab-feeder">
+          <i data-lucide="utensils" class="w-3.5 h-3.5"></i>
+          <span>Pakan</span>
+        </button>
+        <button class="mobile-tab" data-tab="tab-hardware">
+          <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
+          <span>Hardware</span>
+        </button>
+        <button class="mobile-tab" data-tab="tab-simulator">
+          <i data-lucide="sliders" class="w-3.5 h-3.5"></i>
+          <span>Simulator</span>
+        </button>
+        <button class="mobile-tab" data-tab="tab-logs">
+          <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+          <span>Log</span>
+        </button>
+        <button class="mobile-tab" data-tab="tab-trainer">
+          <i data-lucide="graduation-cap" class="w-3.5 h-3.5"></i>
+          <span>Trainer</span>
+        </button>
+      </nav>
+    </div>
+
     <!-- SCROLLABLE WORKBENCH BODY (Padding 24px/6) -->
-    <main class="flex-1 overflow-y-auto p-6 space-y-6">
+    <main class="flex-1 overflow-y-auto p-3 sm:p-6 space-y-4 sm:space-y-6">
 
       <!-- CRITICAL ALERT CALLOUT (Hanya Tampil Bila DO Rendah / Anomali) -->
       <div id="dynamicAlertBanner" class="hidden rounded-xl border border-red-500/30 bg-red-950/30 p-3.5 transition-colors flex items-start justify-between gap-3 font-mono text-xs text-red-300">
@@ -180,7 +213,7 @@
       <!-- Unslop Signature Page Headline (Matching "October 2026" from references/refs) -->
       <div class="flex flex-wrap items-baseline justify-between gap-3">
         <div>
-          <h1 class="text-3xl font-medium tracking-tight text-ink">Tambak Puger <span class="text-neutral-500 font-normal">DOC 42</span></h1>
+          <h1 class="text-xl sm:text-3xl font-medium tracking-tight text-ink">Tambak Puger <span class="text-neutral-500 font-normal">DOC 42</span></h1>
           <p class="text-xs text-neutral-400 mt-1 font-mono">Petak A1 / Udang Vaname / Biomassa 1.840 kg / Target Size 45</p>
         </div>
         <div class="flex items-center gap-2">
@@ -318,7 +351,7 @@
           </div>
 
           <!-- Bottom Action Bar on Canvas -->
-          <div class="pt-3 border-t border-rule flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div class="pt-3 border-t border-rule flex flex-col sm:flex-row flex-wrap items-start sm:items-center justify-between gap-2 sm:gap-3 text-xs">
             <div class="flex items-center gap-2">
               <span class="text-neutral-400 font-mono text-[11px]">Kendali Cepat:</span>
               <button id="btnQuickPondAerator" class="scada-btn font-mono">
@@ -470,7 +503,7 @@
         </div>
 
         <!-- Canvas Multi-Parameter Chart (100% Dark Seamless, No White Box) -->
-        <div class="relative w-full h-[360px] pt-1">
+        <div class="relative w-full h-[240px] sm:h-[320px] lg:h-[360px] pt-1">
           <canvas id="aquacultureChart" aria-label="Grafik Multi-Parameter Kualitas Kolam"></canvas>
         </div>
 
@@ -522,7 +555,7 @@
             <span class="text-xs text-neutral-400">Total Target Hari Ini: 8.0 kg</span>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-4 gap-2.5 font-mono text-xs">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 font-mono text-xs">
             <!-- Siklus 1 -->
             <div class="p-2.5 rounded bg-paper-3 border border-rule">
               <div class="text-neutral-500 text-[10px]">SIKLUS 1</div>
@@ -556,7 +589,7 @@
             </div>
           </div>
 
-          <div class="p-2.5 rounded bg-paper-3 border border-rule text-xs text-neutral-300 font-mono flex items-center justify-between">
+          <div class="p-2.5 rounded bg-paper-3 border border-rule text-xs text-neutral-300 font-mono flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1 sm:gap-0">
             <span>Feeding Rate (FR): <b class="text-ink">2.5% Biomassa</b></span>
             <span>Estimasi Panen: <b class="text-teal-400">DOC 90 (48 hari lagi)</b></span>
           </div>
@@ -991,6 +1024,6 @@ void evaluasiOksigen(float kadarDO) {
   <!-- TOAST CONTAINER (Top Center Floating Pill) -->
   <div id="toastContainer" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 space-y-2 pointer-events-none flex flex-col items-center"></div>
 
-  <script src="app.js?v=3.3"></script>
+  <script src="app.js?v=4.0"></script>
 </body>
 </html>

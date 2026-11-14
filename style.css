@@ -307,3 +307,89 @@ button:disabled, input:disabled, select:disabled {
     animation: none;
   }
 }
+
+/* ===== MOBILE RESPONSIVE ===== */
+
+/* Mobile Horizontal Tab Bar */
+.mobile-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--color-ink-2);
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+  cursor: pointer;
+  border: 1px solid transparent;
+  background: transparent;
+  transition: color 120ms, background-color 120ms, border-color 120ms;
+  font-family: var(--font-mono);
+}
+
+.mobile-tab:hover {
+  color: var(--color-ink);
+  background-color: var(--color-paper-2);
+}
+
+.mobile-tab.active {
+  color: var(--color-ink);
+  background-color: var(--color-paper-3);
+  border-color: var(--color-rule);
+}
+
+/* Hide scrollbar on mobile tab bar */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Mobile body scroll fix */
+@media (max-width: 1023px) {
+  body {
+    overflow-y: auto;
+    overflow-x: clip;
+    height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+  
+  /* Let the workbench column scroll naturally */
+  body > div:last-of-type {
+    height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+  
+  body > div:last-of-type > main {
+    overflow: visible;
+    flex: none;
+  }
+}
+
+/* Fix canvas overflow on narrow screens */
+canvas {
+  max-width: 100%;
+}
+
+/* Ensure telemetry cells have adequate touch targets */
+@media (max-width: 639px) {
+  .telemetry-cell {
+    padding: var(--space-sm);
+  }
+  
+  .scenario-btn {
+    padding: var(--space-sm);
+    min-height: 44px;
+  }
+  
+  .scada-btn {
+    min-height: 36px;
+    padding: var(--space-xs) var(--space-sm);
+  }
+}

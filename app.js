@@ -51,6 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
   try { initLucide(); } catch (e) { console.warn('Lucide error:', e); }
   try { initClock(); } catch (e) { console.warn('Clock error:', e); }
   try { initTabs(); } catch (e) { console.warn('Tabs error:', e); }
+  try { initMobileTabs(); } catch (e) { console.warn('Mobile tabs error:', e); }
   try { initChart(); } catch (e) { console.warn('Chart error:', e); }
   try { initControls(); } catch (e) { console.warn('Controls error:', e); }
   try { initSliders(); } catch (e) { console.warn('Sliders error:', e); }
@@ -68,6 +69,64 @@ function initLucide() {
   if (window.lucide) {
     lucide.createIcons();
   }
+}
+
+// --- Mobile Sidebar Toggle ---
+function toggleMobileSidebar() {
+  const sidebar = document.getElementById('sidebarNav');
+  const backdrop = document.getElementById('sidebarBackdrop');
+  if (!sidebar) return;
+
+  const isOpen = !sidebar.classList.contains('-translate-x-full');
+  if (isOpen) {
+    sidebar.classList.add('-translate-x-full');
+    if (backdrop) backdrop.classList.add('hidden');
+    document.body.style.overflow = '';
+  } else {
+    sidebar.classList.remove('-translate-x-full');
+    if (backdrop) backdrop.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+// --- Mobile Tab Navigation ---
+function initMobileTabs() {
+  const mobileTabs = document.querySelectorAll('.mobile-tab');
+  const sidebarTabs = document.querySelectorAll('.nav-tab');
+
+  mobileTabs.forEach(tab => {
+    tab.addEventListener('click', (e) => {
+      e.preventDefault();
+      const targetId = tab.getAttribute('data-tab');
+
+      // Sync mobile tabs active state
+      mobileTabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+
+      // Sync sidebar tabs active state
+      sidebarTabs.forEach(t => {
+        t.classList.remove('active');
+        if (t.getAttribute('data-tab') === targetId) {
+          t.classList.add('active');
+        }
+      });
+
+      // Switch tab content
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.add('hidden');
+      });
+      const activeContent = document.getElementById(targetId);
+      if (activeContent) {
+        activeContent.classList.remove('hidden');
+      }
+
+      // Re-trigger Chart resize and Lucide icons
+      if ((targetId === 'tab-cockpit' || targetId === 'tab-correlation') && chartInstance) {
+        setTimeout(() => chartInstance.resize(), 50);
+      }
+      initLucide();
+    });
+  });
 }
 
 // --- Manajemen Tema Terang / Gelap (Light & Dark Theme) ---
@@ -170,6 +229,7 @@ function initClock() {
 // --- Tab Navigation ---
 function initTabs() {
   const tabs = document.querySelectorAll('.nav-tab');
+  const mobileTabs = document.querySelectorAll('.mobile-tab');
   tabs.forEach(tab => {
     tab.addEventListener('click', (e) => {
       e.preventDefault();
@@ -177,6 +237,15 @@ function initTabs() {
       tab.classList.add('active');
 
       const targetId = tab.getAttribute('data-tab');
+
+      // Sync mobile tab bar
+      mobileTabs.forEach(mt => {
+        mt.classList.remove('active');
+        if (mt.getAttribute('data-tab') === targetId) {
+          mt.classList.add('active');
+        }
+      });
+
       document.querySelectorAll('.tab-content').forEach(content => {
         content.classList.add('hidden');
       });
@@ -184,6 +253,11 @@ function initTabs() {
       const activeContent = document.getElementById(targetId);
       if (activeContent) {
         activeContent.classList.remove('hidden');
+      }
+
+      // Close mobile sidebar after tab switch
+      if (window.innerWidth < 1024) {
+        toggleMobileSidebar();
       }
 
       // Re-trigger Chart resize and Lucide icons
